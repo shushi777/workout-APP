@@ -216,13 +216,15 @@ def share_receiver():
         print("ERROR: No video file in share")
         # Redirect to home page with error message
         return '''
-            <html>
+            <html dir="rtl">
             <head>
                 <meta http-equiv="refresh" content="3;url=/" />
+                <meta charset="UTF-8">
+                <style>body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }</style>
             </head>
             <body>
-                <h2>No video file received</h2>
-                <p>Redirecting to home page...</p>
+                <h2>לא התקבל קובץ וידאו</h2>
+                <p>מפנה לדף הבית...</p>
             </body>
             </html>
         ''', 400
@@ -232,13 +234,15 @@ def share_receiver():
     if file.filename == '':
         print("ERROR: Empty filename in share")
         return '''
-            <html>
+            <html dir="rtl">
             <head>
                 <meta http-equiv="refresh" content="3;url=/" />
+                <meta charset="UTF-8">
+                <style>body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }</style>
             </head>
             <body>
-                <h2>Invalid video file</h2>
-                <p>Redirecting to home page...</p>
+                <h2>קובץ וידאו לא תקין</h2>
+                <p>מפנה לדף הבית...</p>
             </body>
             </html>
         ''', 400
@@ -247,50 +251,154 @@ def share_receiver():
         # Save the shared video temporarily
         filename = secure_filename(file.filename)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        base_name = os.path.splitext(filename)[0]
+        ext = os.path.splitext(filename)[1]
         unique_filename = f"shared_{timestamp}_{filename}"
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        video_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
 
         try:
-            file.save(filepath)
+            file.save(video_path)
             print(f"SUCCESS: Shared video saved as {unique_filename}")
 
-            # Redirect to timeline editor with the video ID
-            # For now, redirect to home page (will implement timeline editor later)
-            return f'''
-                <html>
-                <head>
-                    <meta http-equiv="refresh" content="2;url=/?shared={unique_filename}" />
-                </head>
-                <body>
-                    <h2>Video received successfully!</h2>
-                    <p>Redirecting to editor...</p>
-                </body>
-                </html>
-            '''
+            # Process the video with scene detection (using default settings)
+            threshold = 27.0  # Default threshold
+            min_scene_length = 0.6  # Default minimum scene length
+
+            try:
+                # Detect scenes
+                video = open_video(video_path)
+                fps = video.frame_rate
+                min_scene_len_frames = int(min_scene_length * fps)
+                scene_list = detect_scenes(video_path, threshold=threshold, min_scene_len=min_scene_len_frames)
+
+                # Get video duration
+                video_duration = 0
+                if scene_list:
+                    video_duration = scene_list[-1][1].get_seconds()
+                else:
+                    from video_processing import get_video_info
+                    video_info = get_video_info(video_path)
+                    video_duration = video_info['duration']
+
+                # Close the video file
+                del video
+
+                # Create output directory
+                output_dir = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}_{timestamp}")
+                os.makedirs(output_dir, exist_ok=True)
+
+                # Move video to output directory
+                stored_video_path = os.path.join(output_dir, unique_filename)
+                shutil.move(video_path, stored_video_path)
+
+                # Extract cut points
+                suggested_cuts = []
+                if scene_list:
+                    for i, scene in enumerate(scene_list):
+                        if i < len(scene_list) - 1:
+                            end_time = scene[1].get_seconds()
+                            suggested_cuts.append(end_time)
+
+                print(f"[Share Receiver] Processed shared video: {len(scene_list)} scenes, {len(suggested_cuts)} cuts")
+
+                # Redirect to timeline editor with suggested cuts
+                cuts_param = ','.join(map(str, suggested_cuts)) if suggested_cuts else ''
+                video_url = f"/download/{os.path.basename(output_dir)}/{unique_filename}"
+                redirect_url = f"/timeline-editor.html?video={video_url}&cuts={cuts_param}"
+
+                return f'''
+                    <html dir="rtl">
+                    <head>
+                        <meta http-equiv="refresh" content="1;url={redirect_url}" />
+                        <meta charset="UTF-8">
+                        <style>
+                            body {{
+                                font-family: Arial, sans-serif;
+                                text-align: center;
+                                padding: 50px;
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                color: white;
+                            }}
+                            .spinner {{
+                                border: 4px solid rgba(255,255,255,0.3);
+                                border-radius: 50%;
+                                border-top: 4px solid white;
+                                width: 40px;
+                                height: 40px;
+                                animation: spin 1s linear infinite;
+                                margin: 20px auto;
+                            }}
+                            @keyframes spin {{
+                                0% {{ transform: rotate(0deg); }}
+                                100% {{ transform: rotate(360deg); }}
+                            }}
+                        </style>
+                    </head>
+                    <body>
+                        <h2>✅ הוידאו התקבל בהצלחה!</h2>
+                        <div class="spinner"></div>
+                        <p>מעבד ומזהה סצינות...</p>
+                        <p>מיד תועבר לעורך הטיימליין</p>
+                    </body>
+                    </html>
+                '''
+
+            except Exception as processing_error:
+                print(f"ERROR: Failed to process shared video: {processing_error}")
+                # If processing fails, still allow user to use the video manually
+                # Move to output folder without processing
+                output_dir = os.path.join(app.config['OUTPUT_FOLDER'], f"{base_name}_{timestamp}")
+                os.makedirs(output_dir, exist_ok=True)
+                stored_video_path = os.path.join(output_dir, unique_filename)
+                if os.path.exists(video_path):
+                    shutil.move(video_path, stored_video_path)
+
+                video_url = f"/download/{os.path.basename(output_dir)}/{unique_filename}"
+                redirect_url = f"/timeline-editor.html?video={video_url}&cuts="
+
+                return f'''
+                    <html dir="rtl">
+                    <head>
+                        <meta http-equiv="refresh" content="2;url={redirect_url}" />
+                        <meta charset="UTF-8">
+                        <style>body {{ font-family: Arial, sans-serif; text-align: center; padding: 50px; }}</style>
+                    </head>
+                    <body>
+                        <h2>⚠️ לא הצלחתי לזהות סצינות אוטומטית</h2>
+                        <p>הוידאו נשמר בהצלחה</p>
+                        <p>מפנה לעורך - תוכל להוסיף נקודות חיתוך ידנית</p>
+                    </body>
+                    </html>
+                '''
+
         except Exception as e:
             print(f"ERROR: Failed to save shared video: {e}")
             return '''
-                <html>
+                <html dir="rtl">
                 <head>
                     <meta http-equiv="refresh" content="3;url=/" />
+                    <meta charset="UTF-8">
+                    <style>body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }</style>
                 </head>
                 <body>
-                    <h2>Error saving video</h2>
-                    <p>Redirecting to home page...</p>
+                    <h2>❌ שגיאה בשמירת הוידאו</h2>
+                    <p>מפנה לדף הבית...</p>
                 </body>
                 </html>
             ''', 500
     else:
         print(f"ERROR: Invalid file type: {file.filename}")
         return '''
-            <html>
+            <html dir="rtl">
             <head>
                 <meta http-equiv="refresh" content="3;url=/" />
+                <meta charset="UTF-8">
+                <style>body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }</style>
             </head>
             <body>
-                <h2>Invalid video format</h2>
-                <p>Please share a video file (MP4, AVI, MOV, MKV, FLV, WMV)</p>
-                <p>Redirecting to home page...</p>
+                <h2>❌ פורמט וידאו לא נתמך</h2>
+                <p>אנא שתף קובץ וידאו (MP4, AVI, MOV, MKV, FLV, WMV)</p>
+                <p>מפנה לדף הבית...</p>
             </body>
             </html>
         ''', 400
