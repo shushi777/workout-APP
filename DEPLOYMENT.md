@@ -411,23 +411,40 @@ railway logs
 - Check R2 bucket has public access enabled
 - Test R2 credentials locally first
 
+### Issue: OpenCV/libGL error
+
+**Error**: `ImportError: libGL.so.1: cannot open shared object file: No such file or directory`
+
+**Solution**:
+This error occurs when OpenCV can't find required system libraries. The project already includes a `nixpacks.toml` file that installs these dependencies:
+
+```toml
+[phases.setup]
+aptPkgs = [
+    "ffmpeg",
+    "libgl1-mesa-glx",
+    "libglib2.0-0",
+    "libsm6",
+    "libxext6",
+    "libxrender-dev",
+    "libgomp1"
+]
+```
+
+**If the error persists**:
+1. Verify `nixpacks.toml` is committed to your Git repository
+2. Redeploy from Railway dashboard (Settings → Redeploy)
+3. Check that `requirements.txt` uses `opencv-python-headless` instead of `opencv-python`
+
 ### Issue: FFmpeg not found
 
 **Error**: `FileNotFoundError: [Errno 2] No such file or directory: 'ffmpeg'`
 
 **Solution**:
-Railway includes FFmpeg by default, but if missing:
-
-1. Create `aptfile` (Railway's package manager):
-   ```
-   ffmpeg
-   ```
-
-2. Or create `nixpacks.toml`:
-   ```toml
-   [phases.setup]
-   aptPkgs = ["ffmpeg"]
-   ```
+The `nixpacks.toml` file already includes FFmpeg. If this error occurs:
+1. Verify `nixpacks.toml` exists in your repository
+2. Check Railway build logs to confirm packages were installed
+3. Redeploy the application
 
 ### Issue: CORS errors
 

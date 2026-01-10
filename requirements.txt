@@ -4,8 +4,8 @@ flask-cors==4.0.0
 werkzeug==3.0.1
 
 # Video Processing Dependencies
-scenedetect[opencv]==0.6.3
-opencv-python==4.10.0.84
+scenedetect==0.6.3
+opencv-python-headless==4.10.0.84  # Headless version for server deployment (no GUI dependencies)
 numpy<2
 
 # Database
