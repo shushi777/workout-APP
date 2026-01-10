@@ -121,7 +121,7 @@
         // Load tags from database on page load
         async function loadTags() {
             try {
-                const response = await fetch('http://localhost:5000/get-tags');
+                const response = await fetch('/get-tags');
                 if (response.ok) {
                     const data = await response.json();
                     availableMuscleGroups = data.muscle_groups || [];
@@ -190,7 +190,7 @@
             formData.append('min_scene_length', minSceneLength.value);
 
             try {
-                const response = await fetch('http://localhost:5000/process', {
+                const response = await fetch('/process', {
                     method: 'POST',
                     body: formData
                 });
@@ -271,7 +271,7 @@
                         <label for="keep-${i}" style="cursor: pointer;">Scene ${i}</label>
                     </h4>
                     <video class="scene-preview" controls>
-                        <source src="http://localhost:5000${videoUrl}" type="video/mp4">
+                        <source src="${videoUrl}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                     <div class="scene-tags-form">
@@ -441,7 +441,7 @@
             hideError();
 
             try {
-                const response = await fetch('http://localhost:5000/save-tags', {
+                const response = await fetch('/save-tags', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
