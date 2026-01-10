@@ -1,8 +1,7 @@
-const CACHE_NAME = 'workout-app-v1';
+const CACHE_NAME = 'workout-app-v2';
 const urlsToCache = [
   '/',
   '/static/css/styles.css',
-  '/static/js/app.js',
   '/manifest.json'
 ];
 
