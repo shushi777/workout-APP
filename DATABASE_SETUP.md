@@ -45,6 +45,16 @@ CREATE DATABASE workout_db;
 
 ### 3. Create Tables
 
+**RECOMMENDED:** Use the migration script to automatically create all tables:
+
+```bash
+python run_migrations.py
+```
+
+This will run all migrations in the `migrations/` folder and create the complete schema.
+
+**Alternatively**, you can create tables manually with SQL:
+
 ```sql
 -- Exercises table (main table)
 CREATE TABLE exercises (
@@ -52,6 +62,11 @@ CREATE TABLE exercises (
     video_file_path TEXT NOT NULL,
     exercise_name VARCHAR(255),
     duration FLOAT,
+    start_time FLOAT,              -- NEW: Phase 4
+    end_time FLOAT,                -- NEW: Phase 4
+    remove_audio BOOLEAN DEFAULT FALSE,  -- NEW: Phase 4
+    thumbnail_url TEXT,            -- NEW: Phase 4
+    video_id INTEGER,              -- NEW: Phase 4
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -80,6 +95,46 @@ CREATE TABLE exercise_equipment (
     equipment_id INTEGER REFERENCES equipment(id) ON DELETE CASCADE,
     PRIMARY KEY (exercise_id, equipment_id)
 );
+
+-- Videos table (Phase 4)
+CREATE TABLE videos (
+    id SERIAL PRIMARY KEY,
+    original_filename VARCHAR(255) NOT NULL,
+    storage_path TEXT NOT NULL,
+    duration FLOAT NOT NULL,
+    file_size BIGINT,
+    mime_type VARCHAR(50),
+    fps FLOAT,
+    resolution VARCHAR(20),
+    storage_type VARCHAR(20) DEFAULT 'local',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    processed_at TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'uploaded'
+);
+
+-- Timelines table (Phase 4)
+CREATE TABLE timelines (
+    id SERIAL PRIMARY KEY,
+    video_id INTEGER NOT NULL REFERENCES videos(id) ON DELETE CASCADE,
+    cut_points JSONB,
+    segments_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    saved_at TIMESTAMP
+);
+
+-- Add foreign key constraint
+ALTER TABLE exercises
+ADD CONSTRAINT fk_exercises_video_id
+FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE;
+
+-- Create indexes
+CREATE INDEX idx_exercises_created_at ON exercises(created_at DESC);
+CREATE INDEX idx_exercises_name ON exercises(exercise_name);
+CREATE INDEX idx_videos_created_at ON videos(created_at DESC);
+CREATE INDEX idx_videos_status ON videos(status);
+CREATE INDEX idx_timelines_video_id ON timelines(video_id);
+CREATE INDEX idx_timelines_created_at ON timelines(created_at DESC);
 ```
 
 ### 4. Verify Tables Created
@@ -87,7 +142,14 @@ CREATE TABLE exercise_equipment (
 \dt
 ```
 
-You should see all 5 tables listed.
+You should see all 7 tables listed:
+- exercises
+- muscle_groups
+- equipment
+- exercise_muscle_groups (junction table)
+- exercise_equipment (junction table)
+- videos (Phase 4)
+- timelines (Phase 4)
 
 ## Application Configuration
 
