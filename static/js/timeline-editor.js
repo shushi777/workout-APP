@@ -13,6 +13,7 @@ const state = {
     zoomLevel: 1,
     draggingCutPoint: null,
     segmentPlaybackListener: null, // Store the current segment playback listener
+    drawerVideoPlaybackListener: null, // Store the drawer video playback listener
     existingTags: {
         muscleGroups: [],
         equipment: []
@@ -226,7 +227,16 @@ function setupEventListeners() {
     const drawerVideoPreview = document.getElementById('drawerVideoPreview');
     drawerVideoPreview.addEventListener('click', () => {
         if (drawerVideoPreview.paused) {
-            drawerVideoPreview.play();
+            // When resuming, check if we're past the segment end
+            if (state.selectedSegmentIndex !== null) {
+                const segment = state.segments[state.selectedSegmentIndex];
+                if (drawerVideoPreview.currentTime >= segment.end || drawerVideoPreview.currentTime < segment.start) {
+                    drawerVideoPreview.currentTime = segment.start;
+                }
+            }
+            drawerVideoPreview.play().catch(err => {
+                console.log('[Timeline Editor] Preview play prevented:', err);
+            });
         } else {
             drawerVideoPreview.pause();
         }
@@ -235,6 +245,27 @@ function setupEventListeners() {
     // Autocomplete inputs
     setupAutocomplete(muscleGroupsInput, 'muscleGroups', muscleGroupsChips);
     setupAutocomplete(equipmentInput, 'equipment', equipmentChips);
+
+    // Add chip buttons (for mobile users without Enter key)
+    document.getElementById('addMuscleGroupBtn').addEventListener('click', () => {
+        const value = muscleGroupsInput.value.trim();
+        if (value) {
+            addChip(muscleGroupsChips, value, 'muscleGroups');
+            muscleGroupsInput.value = '';
+            // Hide autocomplete dropdown
+            document.getElementById('muscleGroupsAutocomplete').classList.add('hidden');
+        }
+    });
+
+    document.getElementById('addEquipmentBtn').addEventListener('click', () => {
+        const value = equipmentInput.value.trim();
+        if (value) {
+            addChip(equipmentChips, value, 'equipment');
+            equipmentInput.value = '';
+            // Hide autocomplete dropdown
+            document.getElementById('equipmentAutocomplete').classList.add('hidden');
+        }
+    });
 
     console.log('[Timeline Editor] Event listeners setup complete');
 }
@@ -768,19 +799,50 @@ function selectSegment(index) {
         state.segmentPlaybackListener = null;
     }
 
+    // Clean up any existing drawer video playback listener
+    if (state.drawerVideoPlaybackListener) {
+        const videoPreview = document.getElementById('drawerVideoPreview');
+        videoPreview.removeEventListener('timeupdate', state.drawerVideoPlaybackListener);
+        state.drawerVideoPlaybackListener = null;
+    }
+
     // Update drawer
     document.getElementById('drawerSegmentNumber').textContent = `#${index + 1}`;
     document.getElementById('drawerStartTime').textContent = formatTime(segment.start);
     document.getElementById('drawerEndTime').textContent = formatTime(segment.end);
 
-    // Set video preview source and play the segment in preview
+    // Set video preview source to the full video
     const videoPreview = document.getElementById('drawerVideoPreview');
-    videoPreview.src = state.videoUrl + `#t=${segment.start},${segment.end}`;
 
-    // Auto-play the preview video
-    videoPreview.play().catch(err => {
-        console.log('[Timeline Editor] Preview auto-play prevented:', err);
-    });
+    // If the source is different, set it. Otherwise just seek
+    if (!videoPreview.src.includes(state.videoUrl)) {
+        videoPreview.src = state.videoUrl;
+    }
+
+    // Wait for the video to load metadata, then seek to segment start
+    const setupDrawerVideo = () => {
+        videoPreview.currentTime = segment.start;
+
+        // Set up event listener to stop playback at segment end
+        state.drawerVideoPlaybackListener = () => {
+            if (videoPreview.currentTime >= segment.end) {
+                videoPreview.pause();
+            }
+        };
+        videoPreview.addEventListener('timeupdate', state.drawerVideoPlaybackListener);
+
+        // Auto-play the preview video
+        videoPreview.play().catch(err => {
+            console.log('[Timeline Editor] Preview auto-play prevented:', err);
+        });
+    };
+
+    // Check if metadata is already loaded
+    if (videoPreview.readyState >= 1) {
+        setupDrawerVideo();
+    } else {
+        videoPreview.addEventListener('loadedmetadata', setupDrawerVideo, { once: true });
+    }
 
     // Also seek the main video player to the segment start and play it
     videoPlayer.currentTime = segment.start;
@@ -843,10 +905,18 @@ function closeDrawer() {
         state.segmentPlaybackListener = null;
     }
 
-    // Pause the preview video
+    // Clean up drawer video playback listener
     const videoPreview = document.getElementById('drawerVideoPreview');
+    if (state.drawerVideoPlaybackListener) {
+        videoPreview.removeEventListener('timeupdate', state.drawerVideoPlaybackListener);
+        state.drawerVideoPlaybackListener = null;
+    }
+
+    // Pause the preview video (this stops both video and audio)
     if (videoPreview) {
         videoPreview.pause();
+        // Reset to beginning to ensure clean state
+        videoPreview.currentTime = 0;
     }
 
     drawTimeline();
@@ -858,9 +928,16 @@ function saveExerciseDetails(event) {
     const exerciseName = exerciseNameInput.value.trim();
     const muscleGroups = Array.from(muscleGroupsChips.querySelectorAll('.tag-chip'))
         .map(chip => chip.textContent.replace('×', '').trim());
-    const equipment = Array.from(equipmentChips.querySelectorAll('.tag-chip'))
+    let equipment = Array.from(equipmentChips.querySelectorAll('.tag-chip'))
         .map(chip => chip.textContent.replace('×', '').trim());
     const removeAudio = document.getElementById('removeAudioCheckbox').checked;
+
+    // If no equipment specified, default to "ללא ציוד"
+    if (equipment.length === 0) {
+        equipment = ['ללא ציוד'];
+        // Add the chip visually so the user can see it was added
+        addChip(equipmentChips, 'ללא ציוד', 'equipment');
+    }
 
     console.log('[Timeline Editor] Validating form:', {
         exerciseName,
@@ -878,11 +955,6 @@ function saveExerciseDetails(event) {
 
     if (muscleGroups.length === 0) {
         alert('אנא הוסף לפחות קבוצת שריר אחת');
-        return;
-    }
-
-    if (equipment.length === 0) {
-        alert('אנא הוסף לפחות פריט ציוד אחד');
         return;
     }
 

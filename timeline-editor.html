@@ -177,8 +177,11 @@
                     <div class="form-group">
                         <label for="muscleGroupsInput">קבוצות שריר *</label>
                         <div class="autocomplete-container">
-                            <input type="text" id="muscleGroupsInput" name="muscleGroups"
-                                   placeholder="הקלד והקש Enter" autocomplete="off">
+                            <div class="input-with-button">
+                                <input type="text" id="muscleGroupsInput" name="muscleGroups"
+                                       placeholder="הקלד והקש Enter" autocomplete="off">
+                                <button type="button" id="addMuscleGroupBtn" class="add-chip-btn" title="הוסף">+</button>
+                            </div>
                             <div id="muscleGroupsAutocomplete" class="autocomplete-dropdown hidden"></div>
                             <div id="muscleGroupsChips" class="tag-chips"></div>
                         </div>
@@ -187,8 +190,11 @@
                     <div class="form-group">
                         <label for="equipmentInput">ציוד נדרש *</label>
                         <div class="autocomplete-container">
-                            <input type="text" id="equipmentInput" name="equipment"
-                                   placeholder="לדוגמה: משקולות, רצועת התנגדות" autocomplete="off">
+                            <div class="input-with-button">
+                                <input type="text" id="equipmentInput" name="equipment"
+                                       placeholder="לדוגמה: משקולות, רצועת התנגדות" autocomplete="off">
+                                <button type="button" id="addEquipmentBtn" class="add-chip-btn" title="הוסף">+</button>
+                            </div>
                             <div id="equipmentAutocomplete" class="autocomplete-dropdown hidden"></div>
                             <div id="equipmentChips" class="tag-chips"></div>
                         </div>
