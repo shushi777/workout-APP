@@ -31,7 +31,7 @@ class Config:
 
     # Database Configuration
     # Support Railway's DATABASE_URL or individual variables
-    DATABASE_URL = os.getenv('DATABASE_URL')
+    DATABASE_URL = os.getenv('DATABASE_PUBLIC_URL')
 
     if DATABASE_URL:
         # Parse Railway's DATABASE_URL (format: postgresql://user:password@host:port/database)
