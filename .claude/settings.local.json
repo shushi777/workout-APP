@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(ffmpeg:*)",
+      "Bash(dir \"C:\\Users\\OmriS\\Desktop\\workout_APP\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

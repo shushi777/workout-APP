@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Video Editor</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Split workout videos and build exercise library">
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WorkoutVid">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/icon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/icon-180x180.png">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Video Scene Splitter</h1>
+        <p class="subtitle">Upload a video to automatically detect and split scenes</p>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📹</div>
+            <p><strong>Click to upload</strong> or drag and drop</p>
+            <p style="font-size: 12px; color: #999; margin-top: 10px;">Supported formats: MP4, AVI, MOV, MKV</p>
+            <input type="file" id="fileInput" accept="video/*">
+        </div>
+
+        <div class="file-info" id="fileInfo">
+            <div class="file-name" id="fileName"></div>
+            <div id="fileSize"></div>
+        </div>
+
+        <div class="settings">
+            <div class="setting-group">
+                <label for="threshold">Detection Threshold (1-100):</label>
+                <input type="number" id="threshold" min="1" max="100" value="27"
+                       title="Lower values detect more scenes, higher values detect fewer scenes">
+            </div>
+            <div class="setting-group">
+                <label for="minSceneLength">Minimum Scene Length (seconds):</label>
+                <input type="number" id="minSceneLength" min="0" step="0.1" value="0.6">
+            </div>
+        </div>
+
+        <button class="btn btn-primary" id="processBtn" disabled>Process Video</button>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="status-message" id="statusMessage">Processing...</div>
+        </div>
+
+        <div class="tagging-section" id="taggingSection">
+            <h3>🏷️ Tag Your Scenes</h3>
+            <p style="font-size: 14px; color: #666; margin-bottom: 15px;">Add exercise name, muscle groups, and equipment for each scene</p>
+            <div id="sceneTagsList"></div>
+            <button class="btn btn-secondary" id="saveTagsBtn">Save to Database</button>
+        </div>
+
+        <div class="results" id="results">
+            <h3>✅ Processing Complete!</h3>
+            <div id="downloadLinks"></div>
+        </div>
+
+        <div class="error" id="error"></div>
+    </div>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="/" class="bottom-nav-item active" data-page="upload">
+            <div class="bottom-nav-icon">📤</div>
+            <div class="bottom-nav-label">Upload</div>
+        </a>
+        <a href="/timeline-editor.html" class="bottom-nav-item" data-page="editor">
+            <div class="bottom-nav-icon">✂️</div>
+            <div class="bottom-nav-label">Editor</div>
+        </a>
+        <a href="/exercise-library.html" class="bottom-nav-item" data-page="library">
+            <div class="bottom-nav-icon">📚</div>
+            <div class="bottom-nav-label">Library</div>
+        </a>
+    </nav>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const processBtn = document.getElementById('processBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const statusMessage = document.getElementById('statusMessage');
+        const results = document.getElementById('results');
+        const downloadLinks = document.getElementById('downloadLinks');
+        const errorDiv = document.getElementById('error');
+        const threshold = document.getElementById('threshold');
+        const minSceneLength = document.getElementById('minSceneLength');
+        const taggingSection = document.getElementById('taggingSection');
+        const sceneTagsList = document.getElementById('sceneTagsList');
+        const saveTagsBtn = document.getElementById('saveTagsBtn');
+
+        let selectedFile = null;
+        let processedData = null;
+        let availableMuscleGroups = [];
+        let availableEquipment = [];
+        let sceneTags = {}; // Store tags for each scene
+
+        // Load tags from database on page load
+        async function loadTags() {
+            try {
+                const response = await fetch('http://localhost:5000/get-tags');
+                if (response.ok) {
+                    const data = await response.json();
+                    availableMuscleGroups = data.muscle_groups || [];
+                    availableEquipment = data.equipment || [];
+                }
+            } catch (error) {
+                console.error('Failed to load tags:', error);
+            }
+        }
+
+        // Load tags when page loads
+        loadTags();
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // File selection
+        fileInput.addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+
+            if (!file.type.startsWith('video/')) {
+                showError('Please select a valid video file');
+                return;
+            }
+
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = `Size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+            fileInfo.classList.add('show');
+            processBtn.disabled = false;
+            hideError();
+            results.classList.remove('show');
+        }
+
+        processBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            processBtn.disabled = true;
+            progressContainer.classList.add('show');
+            results.classList.remove('show');
+            hideError();
+
+            const formData = new FormData();
+            formData.append('video', selectedFile);
+            formData.append('threshold', threshold.value);
+            formData.append('min_scene_length', minSceneLength.value);
+
+            try {
+                const response = await fetch('http://localhost:5000/process', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Processing failed');
+                }
+
+                const data = await response.json();
+                processedData = data;
+
+                progressFill.style.width = '100%';
+                progressFill.textContent = '100%';
+                statusMessage.textContent = 'Redirecting to Timeline Editor...';
+
+                // Redirect to timeline editor with suggested cuts
+                setTimeout(() => {
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        // Fallback: construct URL manually
+                        const cutsParam = encodeURIComponent(JSON.stringify(data.suggested_cuts || []));
+                        window.location.href = `/timeline-editor.html?video=${encodeURIComponent(data.video_url)}&cuts=${cutsParam}`;
+                    }
+                }, 1000);
+
+            } catch (error) {
+                showError(error.message);
+                progressFill.style.width = '0%';
+            } finally {
+                processBtn.disabled = false;
+                setTimeout(() => {
+                    progressContainer.classList.remove('show');
+                    progressFill.style.width = '0%';
+                    progressFill.textContent = '';
+                }, 2000);
+            }
+        });
+
+        // Simulate progress (replace with actual progress updates if available)
+        function simulateProgress() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                if (progress >= 95) {
+                    clearInterval(interval);
+                    return;
+                }
+                progressFill.style.width = progress + '%';
+                progressFill.textContent = progress + '%';
+            }, 500);
+        }
+
+        function showError(message) {
+            errorDiv.textContent = '❌ Error: ' + message;
+            errorDiv.classList.add('show');
+        }
+
+        function hideError() {
+            errorDiv.classList.remove('show');
+        }
+
+        function displayTaggingInterface(data) {
+            sceneTagsList.innerHTML = '';
+            sceneTags = {}; // Reset scene tags
+
+            for (let i = 1; i <= data.scene_count; i++) {
+                sceneTags[i] = { muscle: [], equipment: [] };
+
+                const sceneItem = document.createElement('div');
+                sceneItem.className = 'scene-tag-item';
+                sceneItem.id = `scene-item-${i}`;
+                const videoUrl = data.video_files[i - 1];
+                sceneItem.innerHTML = `
+                    <h4>
+                        <input type="checkbox" id="keep-${i}" class="keep-checkbox" checked>
+                        <label for="keep-${i}" style="cursor: pointer;">Scene ${i}</label>
+                    </h4>
+                    <video class="scene-preview" controls>
+                        <source src="http://localhost:5000${videoUrl}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="scene-tags-form">
+                        <div class="tag-input-group">
+                            <label>Exercise Name:</label>
+                            <input type="text" id="exercise-${i}" placeholder="Enter exercise name">
+                        </div>
+                        <div class="tag-input-group">
+                            <label>Muscle Groups:</label>
+                            <div class="autocomplete-container">
+                                <input type="text" id="muscle-input-${i}" list="muscle-list" placeholder="Type to add muscle group">
+                                <div id="muscle-chips-${i}" class="tag-chips"></div>
+                            </div>
+                        </div>
+                        <div class="tag-input-group">
+                            <label>Required Equipment:</label>
+                            <div class="autocomplete-container">
+                                <input type="text" id="equipment-input-${i}" list="equipment-list" placeholder="Type to add equipment">
+                                <div id="equipment-chips-${i}" class="tag-chips"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                sceneTagsList.appendChild(sceneItem);
+
+                // Setup autocomplete for muscle groups
+                setupTagInput(i, 'muscle', availableMuscleGroups);
+
+                // Setup autocomplete for equipment
+                setupTagInput(i, 'equipment', availableEquipment);
+
+                // Add checkbox toggle handler
+                const checkbox = document.getElementById(`keep-${i}`);
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        sceneItem.classList.remove('excluded');
+                    } else {
+                        sceneItem.classList.add('excluded');
+                    }
+                });
+            }
+
+            // Create datalists for autocomplete
+            updateDataLists();
+        }
+
+        function updateDataLists() {
+            // Remove old datalists if they exist
+            const oldMuscleList = document.getElementById('muscle-list');
+            const oldEquipmentList = document.getElementById('equipment-list');
+            if (oldMuscleList) oldMuscleList.remove();
+            if (oldEquipmentList) oldEquipmentList.remove();
+
+            // Create muscle groups datalist
+            const muscleDatalist = document.createElement('datalist');
+            muscleDatalist.id = 'muscle-list';
+            availableMuscleGroups.forEach(muscle => {
+                const option = document.createElement('option');
+                option.value = muscle;
+                muscleDatalist.appendChild(option);
+            });
+            document.body.appendChild(muscleDatalist);
+
+            // Create equipment datalist
+            const equipmentDatalist = document.createElement('datalist');
+            equipmentDatalist.id = 'equipment-list';
+            availableEquipment.forEach(equip => {
+                const option = document.createElement('option');
+                option.value = equip;
+                equipmentDatalist.appendChild(option);
+            });
+            document.body.appendChild(equipmentDatalist);
+        }
+
+        function setupTagInput(sceneId, type, suggestions) {
+            const input = document.getElementById(`${type}-input-${sceneId}`);
+            const chipsContainer = document.getElementById(`${type}-chips-${sceneId}`);
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    const value = this.value.trim();
+                    if (value && !sceneTags[sceneId][type].includes(value)) {
+                        sceneTags[sceneId][type].push(value);
+
+                        // Add to available suggestions if not already there
+                        if (type === 'muscle' && !availableMuscleGroups.includes(value)) {
+                            availableMuscleGroups.push(value);
+                            updateDataLists();
+                        } else if (type === 'equipment' && !availableEquipment.includes(value)) {
+                            availableEquipment.push(value);
+                            updateDataLists();
+                        }
+
+                        renderChips(sceneId, type);
+                    }
+                    this.value = '';
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                const value = this.value.trim();
+                if (value && !sceneTags[sceneId][type].includes(value)) {
+                    sceneTags[sceneId][type].push(value);
+
+                    // Add to available suggestions if not already there
+                    if (type === 'muscle' && !availableMuscleGroups.includes(value)) {
+                        availableMuscleGroups.push(value);
+                        updateDataLists();
+                    } else if (type === 'equipment' && !availableEquipment.includes(value)) {
+                        availableEquipment.push(value);
+                        updateDataLists();
+                    }
+
+                    renderChips(sceneId, type);
+                }
+                this.value = '';
+            });
+        }
+
+        function renderChips(sceneId, type) {
+            const chipsContainer = document.getElementById(`${type}-chips-${sceneId}`);
+            chipsContainer.innerHTML = '';
+
+            sceneTags[sceneId][type].forEach((tag, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'tag-chip';
+                chip.innerHTML = `
+                    ${tag}
+                    <span class="tag-chip-remove" data-scene="${sceneId}" data-type="${type}" data-index="${index}">×</span>
+                `;
+                chipsContainer.appendChild(chip);
+            });
+
+            // Add click handlers for remove buttons
+            chipsContainer.querySelectorAll('.tag-chip-remove').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const scene = this.dataset.scene;
+                    const type = this.dataset.type;
+                    const index = parseInt(this.dataset.index);
+                    sceneTags[scene][type].splice(index, 1);
+                    renderChips(scene, type);
+                });
+            });
+        }
+
+        saveTagsBtn.addEventListener('click', async () => {
+            if (!processedData) return;
+
+            const tags = [];
+            for (let i = 1; i <= processedData.scene_count; i++) {
+                const keep = document.getElementById(`keep-${i}`).checked;
+                if (keep) {
+                    const exercise = document.getElementById(`exercise-${i}`).value;
+                    const muscle = sceneTags[i].muscle.join(', ');
+                    const equipment = sceneTags[i].equipment.join(', ');
+                    tags.push({ scene: i, exercise, muscle, equipment, keep: true });
+                }
+            }
+
+            if (tags.length === 0) {
+                showError('Please select at least one scene to save');
+                return;
+            }
+
+            saveTagsBtn.disabled = true;
+            hideError();
+
+            try {
+                const response = await fetch('http://localhost:5000/save-tags', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        output_folder: processedData.output_directory,
+                        tags: tags
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to save to database');
+                }
+
+                const data = await response.json();
+
+                // Display success message
+                downloadLinks.innerHTML = `
+                    <p><strong>${data.message}</strong></p>
+                    <p style="margin-top: 10px; color: #2d3748;">Your exercises have been successfully saved to the database!</p>
+                `;
+                results.classList.add('show');
+                taggingSection.classList.remove('show');
+
+                // Clear processed data
+                processedData = null;
+                selectedFile = null;
+                fileInfo.classList.remove('show');
+                processBtn.disabled = true;
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                saveTagsBtn.disabled = false;
+            }
+        });
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('Service Worker registered successfully:', registration.scope);
+
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            console.log('New Service Worker found');
+
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('New Service Worker installed, update available');
+                                    // Optionally show a notification to the user
+                                    if (confirm('New version available! Reload to update?')) {
+                                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+
+                // Handle controller change (new service worker activated)
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    console.log('New Service Worker activated');
+                });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Show custom install button or banner here if desired
+            // For now, the browser's default prompt will show
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA installed successfully');
+            deferredPrompt = null;
+        });
+    </script>
+</body>
+</html>

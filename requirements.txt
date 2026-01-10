@@ -1,0 +1,25 @@
+# Core Flask Dependencies
+flask==3.0.0
+flask-cors==4.0.0
+werkzeug==3.0.1
+
+# Video Processing Dependencies
+scenedetect[opencv]==0.6.3
+opencv-python==4.10.0.84
+numpy<2
+
+# Database
+psycopg2-binary==2.9.10
+
+# Configuration & Environment
+python-dotenv==1.0.0
+
+# Cloud Storage (AWS S3 & Cloudflare R2)
+boto3==1.34.0
+
+# Production WSGI Server
+gunicorn==21.2.0
+
+# Additional Requirements for Railway Deployment
+Pillow>=10.0.0  # Image processing for thumbnails
+requests>=2.31.0  # HTTP library for potential API calls
