@@ -1240,66 +1240,6 @@ def health():
     return jsonify({'status': 'ok'})
 
 
-@app.route('/run-migration', methods=['GET', 'POST'])
-def run_migration():
-    """
-    Run database migrations
-    WARNING: This is a temporary endpoint for deployment setup only
-    Remove after initial deployment!
-    """
-    try:
-        import glob
-
-        # Get all migration files
-        migration_files = sorted(glob.glob('migrations/*.sql'))
-
-        if not migration_files:
-            return jsonify({'error': 'No migration files found'}), 404
-
-        results = []
-        conn = get_db_connection()
-
-        if not conn:
-            return jsonify({'error': 'Database connection failed'}), 500
-
-        cursor = conn.cursor()
-
-        for migration_file in migration_files:
-            try:
-                with open(migration_file, 'r', encoding='utf-8') as f:
-                    migration_sql = f.read()
-
-                # Execute migration
-                cursor.execute(migration_sql)
-                conn.commit()
-
-                results.append({
-                    'file': migration_file,
-                    'status': 'success'
-                })
-
-            except Exception as e:
-                results.append({
-                    'file': migration_file,
-                    'status': 'failed',
-                    'error': str(e)
-                })
-
-        cursor.close()
-        conn.close()
-
-        success_count = sum(1 for r in results if r['status'] == 'success')
-
-        return jsonify({
-            'success': success_count > 0,
-            'message': f'Completed {success_count}/{len(results)} migrations',
-            'results': results
-        })
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
 if __name__ == '__main__':
     print("=" * 60)
     print("Video Scene Splitter Server")
