@@ -1,8 +1,8 @@
 {
   "name": "Workout Video Editor",
   "short_name": "Workout App",
-  "start_url": "workoutapp.up.railway.app/",
-  "scope": "",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007bff",
