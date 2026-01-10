@@ -630,17 +630,17 @@
     color: white;
     border: none;
     border-radius: var(--border-radius-sm);
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
-    padding: 0;
-    width: 44px;
-    min-width: 44px;
+    padding: 0 20px;
+    min-width: 90px;
     height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all var(--transition-fast);
+    white-space: nowrap;
 }
 
 .add-chip-btn:hover {
