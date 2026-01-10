@@ -7,10 +7,9 @@ import os
 from dotenv import load_dotenv
 from urllib.parse import urlparse
 
-# Load environment variables from .env file (only if not already set by environment)
-# Railway sets DATABASE_URL, so we check if it exists before loading .env
-if not os.getenv('DATABASE_URL'):
-    load_dotenv()
+# Load environment variables from .env file
+# override=False ensures Railway environment variables take precedence over .env file
+load_dotenv(override=False)
 
 
 class Config:
