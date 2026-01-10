@@ -281,8 +281,8 @@ Update the `start_url` and `scope` to use your Railway domain:
 {
   "name": "Workout Video Editor",
   "short_name": "Workout App",
-  "start_url": "https://workout-app-production.up.railway.app/",
-  "scope": "https://workout-app-production.up.railway.app/",
+  "start_url": "workoutapp.up.railway.app/",
+  "scope": "workoutapp.up.railway.app/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007bff",
@@ -328,7 +328,7 @@ git push origin main
 
 ### 7.1 Basic Functionality Tests
 
-1. **Upload Page**: Visit `https://your-railway-domain.up.railway.app`
+1. **Upload Page**: Visit `workoutapp.up.railway.app`
    - Upload a video
    - Verify scene detection works
    - Check redirect to timeline editor
