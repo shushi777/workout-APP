@@ -1,8 +1,10 @@
-const CACHE_NAME = 'workout-app-v3';
+const CACHE_NAME = 'workout-app-v4';
 const urlsToCache = [
   '/',
   '/static/css/styles.css',
-  '/manifest.json'
+  '/manifest.json',
+  '/static/icons/icon-192.png',
+  '/static/icons/icon-512.png'
 ];
 
 // Install event - cache essential files
