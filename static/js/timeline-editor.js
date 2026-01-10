@@ -827,6 +827,8 @@ function selectSegment(index) {
         state.drawerVideoPlaybackListener = () => {
             if (videoPreview.currentTime >= segment.end) {
                 videoPreview.pause();
+                // Reset to start of segment for next play
+                videoPreview.currentTime = segment.start;
             }
         };
         videoPreview.addEventListener('timeupdate', state.drawerVideoPlaybackListener);
