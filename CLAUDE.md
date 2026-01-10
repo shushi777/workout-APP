@@ -18,6 +18,7 @@ Workout Video Editor - A mobile-first Progressive Web App (PWA) for editing work
 - ✅ Exercise tagging with autocomplete
 - ✅ PostgreSQL database storage for exercise metadata
 - ✅ Mobile-first responsive design with PWA support
+- ✅ **Web Share Target API**: Share videos from mobile gallery directly to app
 - ✅ FFmpeg video cutting: Split original video into separate segment files
 - ✅ Handle "Remove audio" flag during video cutting
 - ✅ Thumbnail generation for each exercise
@@ -329,6 +330,26 @@ python server.py
 
 ### API Endpoints
 
+#### POST `/share-receiver`
+Handles videos shared from other apps via Web Share Target API (PWA feature).
+
+**Request:**
+- Content-Type: multipart/form-data
+- Fields:
+  - `video`: Video file (shared from mobile gallery or other app)
+
+**Response:**
+- HTML page with auto-redirect to timeline editor
+- Automatically processes video with default settings (threshold: 27, min scene: 0.6s)
+- Shows loading screen with spinner and Hebrew UI
+- Redirects to `/timeline-editor.html?video=...&cuts=...` after processing
+- If processing fails, redirects to timeline editor without suggested cuts
+
+**Error Handling:**
+- Invalid file type: Shows error message and redirects to home page
+- Processing error: Still saves video and redirects to editor (user can add cuts manually)
+- All error messages in Hebrew with RTL support
+
 #### POST `/process`
 Processes uploaded video and detects scenes.
 
@@ -413,6 +434,19 @@ Saves timeline with cut points and exercise segments to PostgreSQL database.
 Serves generated video files for streaming (not download).
 
 ### User Workflow
+
+#### **Option 1: Share Video from Mobile Gallery (PWA Feature)** 📱
+1. **Open Mobile Gallery**: On your phone, open a video in the gallery/photos app
+2. **Tap Share**: Tap the share button
+3. **Select Workout App**: Choose "Workout Video Editor" from the share menu (PWA must be installed)
+4. **Automatic Processing**:
+   - Video is received by the app via Web Share Target API
+   - Automatically runs scene detection with default settings (threshold: 27, min scene: 0.6s)
+   - Shows beautiful loading screen with spinner (Hebrew UI)
+   - Automatically redirects to timeline editor with suggested cuts
+5. **Continue to Timeline Editing**: Proceed with steps 5-9 below
+
+#### **Option 2: Upload from App Interface** 💻
 1. **Upload Video**: User uploads video via drag-and-drop or file selection on index.html
 2. **Configure Parameters** (optional): Set detection threshold (1-100, default: 27) and minimum scene length (default: 0.6s)
 3. **Process Video**: Click "Process Video" to run PySceneDetect analysis
