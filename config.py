@@ -30,19 +30,24 @@ class Config:
     ALLOWED_EXTENSIONS = {'mp4', 'avi', 'mov', 'mkv', 'flv', 'wmv'}
 
     # Database Configuration
-    # Support Railway's DATABASE_URL or individual variables
-    DATABASE_URL = os.getenv('DATABASE_PUBLIC_URL')
+    # Support Railway's DATABASE_PUBLIC_URL or DATABASE_URL or individual variables
+    # Railway provides DATABASE_PUBLIC_URL for external connections
+    DATABASE_URL = os.getenv('DATABASE_PUBLIC_URL') or os.getenv('DATABASE_URL')
 
     if DATABASE_URL:
         # Parse Railway's DATABASE_URL (format: postgresql://user:password@host:port/database)
         parsed = urlparse(DATABASE_URL)
         DB_CONFIG = {
             'host': parsed.hostname,
-            'port': parsed.port,
-            'database': parsed.path[1:],  # Remove leading '/'
+            'port': parsed.port or 5432,  # Default to 5432 if port is None
+            'database': parsed.path[1:] if parsed.path and len(parsed.path) > 1 else '',  # Remove leading '/' and handle empty path
             'user': parsed.username,
             'password': parsed.password
         }
+        
+        # Validate that we have all required fields
+        if not all([DB_CONFIG['host'], DB_CONFIG['database'], DB_CONFIG['user'], DB_CONFIG['password']]):
+            raise ValueError("DATABASE_URL is missing required connection parameters")
     else:
         # Use individual variables (local development)
         DB_CONFIG = {
