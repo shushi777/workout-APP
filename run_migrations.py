@@ -10,11 +10,16 @@ from pathlib import Path
 
 def get_db_connection():
     """Get database connection from environment or config"""
-    # Try DATABASE_PUBLIC_URL first (Railway provides this)
-    database_url = os.getenv('DATABASE_PUBLIC_URL') or os.getenv('DATABASE_URL')
+    # Try DATABASE_URL first (for Railway internal connections via railway run)
+    # DATABASE_PUBLIC_URL is for external connections and may not work with railway run
+    database_url = os.getenv('DATABASE_URL') or os.getenv('DATABASE_PUBLIC_URL')
 
     if database_url:
-        print(f"[Migration] Using DATABASE_PUBLIC_URL from environment")
+        # Check which one we're using for better logging
+        if os.getenv('DATABASE_URL'):
+            print(f"[Migration] Using DATABASE_URL from environment")
+        else:
+            print(f"[Migration] Using DATABASE_PUBLIC_URL from environment")
         return psycopg2.connect(database_url)
 
     # Fallback to individual environment variables
