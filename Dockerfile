@@ -4,7 +4,7 @@ FROM python:3.13.3-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies including FFmpeg
+# Install system dependencies including FFmpeg and build tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libgl1-mesa-glx \
@@ -14,7 +14,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender-dev \
     libgomp1 \
     libpq-dev \
+    build-essential \
     gcc \
+    g++ \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
