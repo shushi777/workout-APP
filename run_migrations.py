@@ -7,32 +7,36 @@ import psycopg2
 import os
 import sys
 from pathlib import Path
+from config import Config
 
 def get_db_connection():
     """Get database connection from environment or config"""
-    # Try DATABASE_URL first (for Railway internal connections via railway run)
-    # DATABASE_PUBLIC_URL is for external connections and may not work with railway run
-    database_url = os.getenv('DATABASE_URL') or os.getenv('DATABASE_PUBLIC_URL')
-
-    if database_url:
-        # Check which one we're using for better logging
-        if os.getenv('DATABASE_URL'):
-            print(f"[Migration] Using DATABASE_URL from environment")
-        else:
-            print(f"[Migration] Using DATABASE_PUBLIC_URL from environment")
-        return psycopg2.connect(database_url)
-
-    # Fallback to individual environment variables
-    db_config = {
-        'host': os.getenv('DB_HOST', 'localhost'),
-        'port': int(os.getenv('DB_PORT', 5432)),
-        'database': os.getenv('DB_NAME', 'workout_db'),
-        'user': os.getenv('DB_USER', 'postgres'),
-        'password': os.getenv('DB_PASSWORD', '')
-    }
-
-    print(f"[Migration] Connecting to database: {db_config['database']} at {db_config['host']}")
-    return psycopg2.connect(**db_config)
+    # Use Config.DB_CONFIG which already handles DATABASE_PUBLIC_URL and DATABASE_URL correctly
+    try:
+        db_config = Config.DB_CONFIG
+        print(f"[Migration] Connecting to database: {db_config['database']} at {db_config['host']}:{db_config['port']}")
+        return psycopg2.connect(**db_config)
+    except Exception as e:
+        print(f"[Migration] Failed to get config: {e}")
+        # Fallback: try direct environment variables
+        database_url = os.getenv('DATABASE_URL') or os.getenv('DATABASE_PUBLIC_URL')
+        if database_url:
+            if os.getenv('DATABASE_URL'):
+                print(f"[Migration] Using DATABASE_URL from environment (fallback)")
+            else:
+                print(f"[Migration] Using DATABASE_PUBLIC_URL from environment (fallback)")
+            return psycopg2.connect(database_url)
+        
+        # Last resort: individual variables
+        db_config = {
+            'host': os.getenv('DB_HOST', 'localhost'),
+            'port': int(os.getenv('DB_PORT', 5432)),
+            'database': os.getenv('DB_NAME', 'workout_db'),
+            'user': os.getenv('DB_USER', 'postgres'),
+            'password': os.getenv('DB_PASSWORD', '')
+        }
+        print(f"[Migration] Using individual environment variables (fallback)")
+        return psycopg2.connect(**db_config)
 
 
 def run_migrations():
