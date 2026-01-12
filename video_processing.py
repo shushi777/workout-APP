@@ -10,6 +10,28 @@ from typing import List, Dict, Optional, Tuple
 from datetime import datetime
 from werkzeug.utils import secure_filename
 
+# Import config to get FFMPEG_PATH
+try:
+    from config import Config
+    FFMPEG_PATH = Config.FFMPEG_PATH
+except ImportError:
+    FFMPEG_PATH = os.getenv('FFMPEG_PATH', 'ffmpeg')
+
+
+def get_ffmpeg_command() -> str:
+    """Get FFmpeg command path"""
+    return FFMPEG_PATH if FFMPEG_PATH else 'ffmpeg'
+
+
+def get_ffprobe_command() -> str:
+    """Get FFprobe command path (usually same as FFmpeg)"""
+    if FFMPEG_PATH and FFMPEG_PATH != 'ffmpeg':
+        # If FFMPEG_PATH is a full path, replace 'ffmpeg' with 'ffprobe'
+        if os.path.sep in FFMPEG_PATH:
+            return FFMPEG_PATH.replace('ffmpeg', 'ffprobe')
+        return 'ffprobe'  # Fallback to default
+    return 'ffprobe'
+
 
 class VideoProcessingError(Exception):
     """Custom exception for video processing errors"""
@@ -19,14 +41,24 @@ class VideoProcessingError(Exception):
 def check_ffmpeg_installed() -> bool:
     """
     Check if FFmpeg is installed and accessible
+    Tries both the configured FFMPEG_PATH and default 'ffmpeg' command
 
     Returns:
         True if FFmpeg is available, False otherwise
     """
+    # Try configured path first
+    if FFMPEG_PATH and FFMPEG_PATH != 'ffmpeg':
+        try:
+            subprocess.run([FFMPEG_PATH, '-version'], capture_output=True, check=True, timeout=5)
+            return True
+        except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
+            pass
+    
+    # Fallback to default 'ffmpeg' command
     try:
-        subprocess.run(['ffmpeg', '-version'], capture_output=True, check=True)
+        subprocess.run([get_ffmpeg_command(), '-version'], capture_output=True, check=True, timeout=5)
         return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
+    except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
         return False
 
 
@@ -42,7 +74,7 @@ def get_video_info(video_path: str) -> Dict:
     """
     try:
         cmd = [
-            'ffprobe',
+            get_ffprobe_command(),
             '-v', 'error',
             '-show_entries', 'format=duration:stream=width,height,r_frame_rate,codec_name',
             '-of', 'json',
@@ -121,7 +153,7 @@ def cut_video_segment(input_path: str, output_path: str, start_time: float, end_
 
         # Build FFmpeg command
         cmd = [
-            'ffmpeg',
+            get_ffmpeg_command(),
             '-y',  # Overwrite output file
             '-ss', format_timestamp(start_time),  # Start time
             '-i', input_path,  # Input file
@@ -180,7 +212,7 @@ def generate_thumbnail(video_path: str, output_path: str, timestamp: float = 0.0
     """
     try:
         cmd = [
-            'ffmpeg',
+            get_ffmpeg_command(),
             '-y',  # Overwrite output file
             '-ss', format_timestamp(timestamp),  # Seek to timestamp
             '-i', video_path,  # Input file
