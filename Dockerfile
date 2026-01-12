@@ -33,4 +33,6 @@ COPY . .
 EXPOSE 8080
 
 # Run Gunicorn
-CMD gunicorn server:app --bind 0.0.0.0:${PORT:-8080} --workers 2 --timeout 120
+# Railway sets PORT environment variable automatically
+# Use shell form to allow variable expansion
+CMD ["sh", "-c", "gunicorn server:app --bind 0.0.0.0:${PORT:-8080} --workers 2 --timeout 120"]
