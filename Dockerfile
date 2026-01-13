@@ -26,6 +26,10 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy entrypoint script and make it executable
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Copy application code
 COPY . .
 
@@ -35,7 +39,6 @@ EXPOSE 8080
 # Set default PORT environment variable
 ENV PORT=8080
 
-# Run Gunicorn
-# Railway sets PORT environment variable automatically
-# Use shell form to allow PORT variable expansion at runtime
-CMD sh -c "exec gunicorn server:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+# Run entrypoint script
+# Railway sets PORT environment variable at runtime
+ENTRYPOINT ["/entrypoint.sh"]
