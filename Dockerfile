@@ -32,7 +32,10 @@ COPY . .
 # Expose port (Railway will set PORT env var)
 EXPOSE 8080
 
+# Set default PORT environment variable
+ENV PORT=8080
+
 # Run Gunicorn
 # Railway sets PORT environment variable automatically
 # Use shell form to allow PORT variable expansion at runtime
-CMD ["sh", "-c", "gunicorn server:app --bind 0.0.0.0:${PORT:-8080} --workers 2 --timeout 120"]
+CMD sh -c "exec gunicorn server:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
