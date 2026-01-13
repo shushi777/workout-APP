@@ -1,0 +1,13 @@
+# Railway Configuration
+# This file tells Railway to use the Dockerfile
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# Use the Dockerfile's ENTRYPOINT/CMD
+# Don't override with custom start command
+startCommand = ""
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
