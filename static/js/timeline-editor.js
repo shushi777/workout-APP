@@ -247,7 +247,13 @@ function setupEventListeners() {
     setupAutocomplete(equipmentInput, 'equipment', equipmentChips);
 
     // Add chip buttons (for mobile users without Enter key)
-    document.getElementById('addMuscleGroupBtn').addEventListener('click', () => {
+    const muscleGroupBtn = document.getElementById('addMuscleGroupBtn');
+    const equipmentBtn = document.getElementById('addEquipmentBtn');
+
+    // Handler function for adding muscle group
+    const addMuscleGroup = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         const value = muscleGroupsInput.value.trim();
         if (value) {
             addChip(muscleGroupsChips, value, 'muscleGroups');
@@ -255,9 +261,12 @@ function setupEventListeners() {
             // Hide autocomplete dropdown
             document.getElementById('muscleGroupsAutocomplete').classList.add('hidden');
         }
-    });
+    };
 
-    document.getElementById('addEquipmentBtn').addEventListener('click', () => {
+    // Handler function for adding equipment
+    const addEquipment = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         const value = equipmentInput.value.trim();
         if (value) {
             addChip(equipmentChips, value, 'equipment');
@@ -265,7 +274,14 @@ function setupEventListeners() {
             // Hide autocomplete dropdown
             document.getElementById('equipmentAutocomplete').classList.add('hidden');
         }
-    });
+    };
+
+    // Add both click and touchend events for better mobile support
+    muscleGroupBtn.addEventListener('click', addMuscleGroup);
+    muscleGroupBtn.addEventListener('touchend', addMuscleGroup);
+
+    equipmentBtn.addEventListener('click', addEquipment);
+    equipmentBtn.addEventListener('touchend', addEquipment);
 
     console.log('[Timeline Editor] Event listeners setup complete');
 }
