@@ -253,23 +253,43 @@ function setupEventListeners() {
     console.log('[Timeline Editor] Muscle group button:', muscleGroupBtn);
     console.log('[Timeline Editor] Equipment button:', equipmentBtn);
 
-    // Track last event time to prevent double-firing from both touch and click
-    let lastMuscleGroupClick = 0;
-    let lastEquipmentClick = 0;
+    // Check if buttons exist before adding event listeners
+    if (!muscleGroupBtn || !equipmentBtn) {
+        console.warn('[Timeline Editor] Add buttons not found, skipping event listeners');
+        return;
+    }
+
+    // Track last event time and type to prevent double-firing from both touch and click
+    let lastMuscleGroupEvent = { time: 0, type: null };
+    let lastEquipmentEvent = { time: 0, type: null };
 
     // Handler function for adding muscle group
     const addMuscleGroup = (event) => {
         console.log('[Timeline Editor] addMuscleGroup called, event type:', event.type);
 
         const now = Date.now();
-        if (now - lastMuscleGroupClick < 300) {
-            // Prevent double-firing within 300ms
+        const eventType = event.type;
+        
+        // Prevent double-firing: if same event type within 300ms, or if touch followed by click within 500ms
+        if (eventType === 'click' && lastMuscleGroupEvent.type === 'touchend' && 
+            now - lastMuscleGroupEvent.time < 500) {
+            // This click was triggered by the touch event, ignore it
+            console.log('[Timeline Editor] Ignoring click after touch');
+            return;
+        }
+        
+        if (eventType === lastMuscleGroupEvent.type && now - lastMuscleGroupEvent.time < 300) {
+            // Same event type fired twice quickly, prevent double-firing
             console.log('[Timeline Editor] Prevented double-fire');
             return;
         }
-        lastMuscleGroupClick = now;
+        
+        lastMuscleGroupEvent = { time: now, type: eventType };
 
-        event.preventDefault();
+        // Only prevent default for touch events, not click (to allow click to work on mobile)
+        if (eventType === 'touchend') {
+            event.preventDefault();
+        }
         event.stopPropagation();
 
         const value = muscleGroupsInput.value.trim();
@@ -294,14 +314,28 @@ function setupEventListeners() {
         console.log('[Timeline Editor] addEquipment called, event type:', event.type);
 
         const now = Date.now();
-        if (now - lastEquipmentClick < 300) {
-            // Prevent double-firing within 300ms
+        const eventType = event.type;
+        
+        // Prevent double-firing: if same event type within 300ms, or if touch followed by click within 500ms
+        if (eventType === 'click' && lastEquipmentEvent.type === 'touchend' && 
+            now - lastEquipmentEvent.time < 500) {
+            // This click was triggered by the touch event, ignore it
+            console.log('[Timeline Editor] Ignoring click after touch');
+            return;
+        }
+        
+        if (eventType === lastEquipmentEvent.type && now - lastEquipmentEvent.time < 300) {
+            // Same event type fired twice quickly, prevent double-firing
             console.log('[Timeline Editor] Prevented double-fire');
             return;
         }
-        lastEquipmentClick = now;
+        
+        lastEquipmentEvent = { time: now, type: eventType };
 
-        event.preventDefault();
+        // Only prevent default for touch events, not click (to allow click to work on mobile)
+        if (eventType === 'touchend') {
+            event.preventDefault();
+        }
         event.stopPropagation();
 
         const value = equipmentInput.value.trim();
@@ -321,12 +355,13 @@ function setupEventListeners() {
         }
     };
 
-    // Add both click and touchstart events for better mobile support
-    // Using touchstart instead of touchend for more immediate response
-    muscleGroupBtn.addEventListener('touchstart', addMuscleGroup, { passive: false });
+    // Add both click and touchend events for better mobile support
+    // Using touchend instead of touchstart to avoid preventing click events
+    // touchend fires after the touch is complete, allowing click to work as fallback
+    muscleGroupBtn.addEventListener('touchend', addMuscleGroup, { passive: false });
     muscleGroupBtn.addEventListener('click', addMuscleGroup);
 
-    equipmentBtn.addEventListener('touchstart', addEquipment, { passive: false });
+    equipmentBtn.addEventListener('touchend', addEquipment, { passive: false });
     equipmentBtn.addEventListener('click', addEquipment);
 
     console.log('[Timeline Editor] Event listeners setup complete');
