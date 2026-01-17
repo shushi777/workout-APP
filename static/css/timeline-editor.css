@@ -652,6 +652,16 @@
 
 .add-chip-btn:active {
     transform: scale(0.95);
+    background: #5a52d5; /* Darker shade when pressed */
+}
+
+/* Mobile-specific touch feedback */
+@media (hover: none) and (pointer: coarse) {
+    .add-chip-btn {
+        /* Ensure buttons are easily tappable on touch devices */
+        min-height: 44px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
 }
 
 .autocomplete-dropdown {

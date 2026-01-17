@@ -250,38 +250,84 @@ function setupEventListeners() {
     const muscleGroupBtn = document.getElementById('addMuscleGroupBtn');
     const equipmentBtn = document.getElementById('addEquipmentBtn');
 
+    console.log('[Timeline Editor] Muscle group button:', muscleGroupBtn);
+    console.log('[Timeline Editor] Equipment button:', equipmentBtn);
+
+    // Track last event time to prevent double-firing from both touch and click
+    let lastMuscleGroupClick = 0;
+    let lastEquipmentClick = 0;
+
     // Handler function for adding muscle group
     const addMuscleGroup = (event) => {
+        console.log('[Timeline Editor] addMuscleGroup called, event type:', event.type);
+
+        const now = Date.now();
+        if (now - lastMuscleGroupClick < 300) {
+            // Prevent double-firing within 300ms
+            console.log('[Timeline Editor] Prevented double-fire');
+            return;
+        }
+        lastMuscleGroupClick = now;
+
         event.preventDefault();
         event.stopPropagation();
+
         const value = muscleGroupsInput.value.trim();
+        console.log('[Timeline Editor] Input value:', value);
+
         if (value) {
             addChip(muscleGroupsChips, value, 'muscleGroups');
             muscleGroupsInput.value = '';
             // Hide autocomplete dropdown
-            document.getElementById('muscleGroupsAutocomplete').classList.add('hidden');
+            const dropdown = document.getElementById('muscleGroupsAutocomplete');
+            if (dropdown) {
+                dropdown.classList.add('hidden');
+            }
+            console.log('[Timeline Editor] Chip added successfully');
+        } else {
+            console.log('[Timeline Editor] No value to add');
         }
     };
 
     // Handler function for adding equipment
     const addEquipment = (event) => {
+        console.log('[Timeline Editor] addEquipment called, event type:', event.type);
+
+        const now = Date.now();
+        if (now - lastEquipmentClick < 300) {
+            // Prevent double-firing within 300ms
+            console.log('[Timeline Editor] Prevented double-fire');
+            return;
+        }
+        lastEquipmentClick = now;
+
         event.preventDefault();
         event.stopPropagation();
+
         const value = equipmentInput.value.trim();
+        console.log('[Timeline Editor] Input value:', value);
+
         if (value) {
             addChip(equipmentChips, value, 'equipment');
             equipmentInput.value = '';
             // Hide autocomplete dropdown
-            document.getElementById('equipmentAutocomplete').classList.add('hidden');
+            const dropdown = document.getElementById('equipmentAutocomplete');
+            if (dropdown) {
+                dropdown.classList.add('hidden');
+            }
+            console.log('[Timeline Editor] Chip added successfully');
+        } else {
+            console.log('[Timeline Editor] No value to add');
         }
     };
 
-    // Add both click and touchend events for better mobile support
+    // Add both click and touchstart events for better mobile support
+    // Using touchstart instead of touchend for more immediate response
+    muscleGroupBtn.addEventListener('touchstart', addMuscleGroup, { passive: false });
     muscleGroupBtn.addEventListener('click', addMuscleGroup);
-    muscleGroupBtn.addEventListener('touchend', addMuscleGroup);
 
+    equipmentBtn.addEventListener('touchstart', addEquipment, { passive: false });
     equipmentBtn.addEventListener('click', addEquipment);
-    equipmentBtn.addEventListener('touchend', addEquipment);
 
     console.log('[Timeline Editor] Event listeners setup complete');
 }
