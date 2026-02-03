@@ -28,11 +28,11 @@ Rebuild the workout video editor frontend from vanilla HTML/JS to React + Tailwi
   3. App displays in dark theme with lighter UI elements
   4. Hebrew text renders correctly in RTL layout
   5. Development server proxies API calls to Flask backend
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 01-01: Vite + React + TypeScript + Tailwind setup
-- [ ] 01-02: App shell with tab navigation and Zustand stores
+- [ ] 01-01-PLAN.md — Vite + React + TypeScript + Tailwind setup with Flask proxy
+- [ ] 01-02-PLAN.md — App shell with tab navigation, Button component, and Zustand stores
 
 ### Phase 2: Upload Feature
 **Goal**: User can upload a video and see it processed for scene detection
@@ -109,7 +109,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Design System | 0/2 | Not started | - |
+| 1. Foundation & Design System | 0/2 | Planned | - |
 | 2. Upload Feature | 0/1 | Not started | - |
 | 3. Timeline Editor | 0/4 | Not started | - |
 | 4. Exercise Library | 0/2 | Not started | - |
