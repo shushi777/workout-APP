@@ -147,3 +147,128 @@ export async function saveTimeline(data: SaveTimelineRequest): Promise<SaveTimel
 
   return response.json();
 }
+
+// Exercise Library API Types and Functions
+
+export interface Exercise {
+  id: number;
+  video_file_path: string;
+  video_url: string;
+  exercise_name: string;
+  duration: number;
+  start_time: number;
+  end_time: number;
+  remove_audio: boolean;
+  thumbnail_url: string | null;
+  created_at: string;
+  muscle_groups: string[];
+  equipment: string[];
+}
+
+export interface ExercisesFilters {
+  search?: string;
+  muscle_groups?: string[];
+  equipment?: string[];
+  page?: number;
+  per_page?: number;
+  sort_by?: 'created_at' | 'duration' | 'exercise_name';
+  sort_order?: 'asc' | 'desc';
+}
+
+export interface PaginationInfo {
+  page: number;
+  per_page: number;
+  total_count: number;
+  total_pages: number;
+  has_next: boolean;
+  has_prev: boolean;
+}
+
+export interface ExercisesResponse {
+  success: boolean;
+  exercises: Exercise[];
+  muscle_groups: string[];
+  equipment: string[];
+  pagination: PaginationInfo;
+}
+
+/**
+ * Fetch exercises with optional filtering and pagination
+ */
+export async function fetchExercises(filters: ExercisesFilters = {}): Promise<ExercisesResponse> {
+  const params = new URLSearchParams();
+
+  if (filters.search) params.append('search', filters.search);
+  if (filters.muscle_groups?.length) params.append('muscle_groups', filters.muscle_groups.join(','));
+  if (filters.equipment?.length) params.append('equipment', filters.equipment.join(','));
+  if (filters.page) params.append('page', filters.page.toString());
+  if (filters.per_page) params.append('per_page', filters.per_page.toString());
+  if (filters.sort_by) params.append('sort_by', filters.sort_by);
+  if (filters.sort_order) params.append('sort_order', filters.sort_order);
+
+  const url = `/api/exercises${params.toString() ? `?${params.toString()}` : ''}`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch exercises');
+  }
+
+  return response.json();
+}
+
+export interface UpdateExerciseRequest {
+  exercise_name?: string;
+  muscle_groups?: string[];
+  equipment?: string[];
+  remove_audio?: boolean;
+}
+
+export interface UpdateExerciseResponse {
+  success: boolean;
+  message: string;
+  exercise: Exercise;
+}
+
+/**
+ * Update an existing exercise
+ */
+export async function updateExercise(
+  exerciseId: number,
+  data: UpdateExerciseRequest
+): Promise<UpdateExerciseResponse> {
+  const response = await fetch(`/api/exercises/${exerciseId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to update exercise: ${errorText}`);
+  }
+
+  return response.json();
+}
+
+export interface DeleteExerciseResponse {
+  success: boolean;
+  message: string;
+}
+
+/**
+ * Delete an exercise
+ */
+export async function deleteExercise(exerciseId: number): Promise<DeleteExerciseResponse> {
+  const response = await fetch(`/api/exercises/${exerciseId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to delete exercise: ${errorText}`);
+  }
+
+  return response.json();
+}
