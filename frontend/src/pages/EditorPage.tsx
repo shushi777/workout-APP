@@ -7,6 +7,7 @@ import { getTags } from '@/lib/api';
 import { formatTime } from '@/hooks/useCanvasTimeline';
 import { cn } from '@/lib/utils';
 import { Scissors, Check, X } from 'lucide-react';
+import { SegmentDrawer } from '@/components/tagging/SegmentDrawer';
 
 export function EditorPage() {
   const [searchParams] = useSearchParams();
@@ -198,6 +199,9 @@ export function EditorPage() {
           <p>Segments: {segments.length}</p>
         </div>
       )}
+
+      {/* Segment Tagging Drawer */}
+      <SegmentDrawer />
     </div>
   );
 }

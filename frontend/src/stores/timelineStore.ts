@@ -51,7 +51,7 @@ interface TimelineState {
   deleteCutPoint: (id: string) => void;
   selectCutPoint: (id: string | null) => void;
   selectSegment: (index: number | null) => void;
-  updateSegmentDetails: (index: number, details: SegmentDetails) => void;
+  updateSegmentDetails: (index: number, details: SegmentDetails | null) => void;
   setCurrentTime: (time: number) => void;
   setPlaying: (playing: boolean) => void;
   setZoomLevel: (level: number) => void;
