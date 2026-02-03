@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTimelineStore } from '@/stores/timelineStore';
-import { TimelineCanvas, VideoPlayer } from '@/components/timeline';
+import { TimelineCanvas, VideoPlayer, SaveFlow } from '@/components/timeline';
 import { Button } from '@/components/ui/Button';
 import { getTags } from '@/lib/api';
 import { formatTime } from '@/hooks/useCanvasTimeline';
@@ -11,6 +11,7 @@ import { SegmentDrawer } from '@/components/tagging/SegmentDrawer';
 
 export function EditorPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   // Get URL parameters
   const videoUrl = searchParams.get('video');
@@ -90,7 +91,7 @@ export function EditorPage() {
             אנא העלה וידאו תחילה מעמוד ההעלאה
           </p>
           <Button
-            onClick={() => window.location.href = '/'}
+            onClick={() => navigate('/')}
             variant="primary"
           >
             חזרה להעלאה
@@ -110,7 +111,16 @@ export function EditorPage() {
             <Scissors className="w-4 h-4 ml-1" />
             הוסף חיתוך
           </Button>
+          <SaveFlow />
         </div>
+      </div>
+
+      {/* Status indicator: tagged vs total segments */}
+      <div className="text-sm text-gray-400 text-right">
+        <span>{segments.filter(s => s.details).length}</span>
+        <span> / </span>
+        <span>{segments.length}</span>
+        <span className="mr-1">סגמנטים מתויגים</span>
       </div>
 
       {/* Video Player with segment preview */}
