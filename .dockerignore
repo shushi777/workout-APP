@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+
+# Development files
+.env
+.env.local
+.planning/
+
+# Local output directories
+uploads/
+output/
+
+# Frontend node_modules (will be installed fresh in Docker)
+frontend/node_modules/
+frontend/dev-dist/
+
+# Build artifacts (will be built fresh in Docker)
+static/react/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Video files (shouldn't be in repo anyway)
+*.mp4
+*.avi
+*.mov
+*.mkv

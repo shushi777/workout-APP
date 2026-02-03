@@ -4,7 +4,7 @@ FROM python:3.13.3-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies including FFmpeg and build tools
+# Install system dependencies including FFmpeg, Node.js, and build tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libgl1-mesa-glx \
@@ -18,6 +18,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     python3-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 20.x for frontend build
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
@@ -30,8 +36,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Copy application code
+# Copy all application code
 COPY . .
+
+# Build frontend (after COPY . . to ensure fresh build)
+# Frontend builds to static/react/ directory
+RUN cd frontend && npm ci && npm run build
 
 # Expose port (Railway will set PORT env var)
 EXPOSE 8080

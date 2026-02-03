@@ -180,29 +180,33 @@ def create_csv_report(scene_list, csv_path, video_path, tags=None):
             })
 
 
+# React frontend static files directory
+REACT_BUILD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'react')
+
+
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index.html')
+    return send_from_directory(REACT_BUILD_DIR, 'index.html')
 
 
-@app.route('/timeline-editor.html')
-def timeline_editor():
-    return send_from_directory('.', 'timeline-editor.html')
-
-
-@app.route('/exercise-library.html')
-def exercise_library():
-    return send_from_directory('.', 'exercise-library.html')
-
-
-@app.route('/manifest.json')
+@app.route('/manifest.webmanifest')
 def manifest():
-    return send_from_directory('.', 'manifest.json')
+    return send_from_directory(REACT_BUILD_DIR, 'manifest.webmanifest')
 
 
-@app.route('/service-worker.js')
+@app.route('/sw.js')
 def service_worker():
-    return send_from_directory('.', 'service-worker.js')
+    return send_from_directory(REACT_BUILD_DIR, 'sw.js')
+
+
+@app.route('/assets/<path:filename>')
+def serve_assets(filename):
+    return send_from_directory(os.path.join(REACT_BUILD_DIR, 'assets'), filename)
+
+
+@app.route('/icons/<path:filename>')
+def serve_icons(filename):
+    return send_from_directory(os.path.join(REACT_BUILD_DIR, 'icons'), filename)
 
 
 @app.route('/share-receiver', methods=['POST'])
@@ -304,7 +308,7 @@ def share_receiver():
                 # Redirect to timeline editor with suggested cuts
                 cuts_param = ','.join(map(str, suggested_cuts)) if suggested_cuts else ''
                 video_url = f"/download/{os.path.basename(output_dir)}/{unique_filename}"
-                redirect_url = f"/timeline-editor.html?video={video_url}&cuts={cuts_param}"
+                redirect_url = f"/editor?video={video_url}&cuts={cuts_param}"
 
                 return f'''
                     <html dir="rtl">
@@ -354,7 +358,7 @@ def share_receiver():
                     shutil.move(video_path, stored_video_path)
 
                 video_url = f"/download/{os.path.basename(output_dir)}/{unique_filename}"
-                redirect_url = f"/timeline-editor.html?video={video_url}&cuts="
+                redirect_url = f"/editor?video={video_url}&cuts="
 
                 return f'''
                     <html dir="rtl">
@@ -503,7 +507,7 @@ def process_video():
             'video_url': f"/download/{os.path.basename(output_dir)}/{unique_filename}",
             'suggested_cuts': suggested_cuts,
             'video_duration': video_duration,
-            'redirect_url': f"/timeline-editor.html?video=/download/{os.path.basename(output_dir)}/{unique_filename}&cuts={cuts_param}"
+            'redirect_url': f"/editor?video=/download/{os.path.basename(output_dir)}/{unique_filename}&cuts={cuts_param}"
         })
 
     except Exception as e:
@@ -1346,6 +1350,20 @@ def delete_exercise(exercise_id):
 def health():
     """Health check endpoint"""
     return jsonify({'status': 'ok'})
+
+
+# Catch-all route for React client-side routing (MUST be after all API routes)
+@app.route('/<path:path>')
+def catch_all(path):
+    # Don't catch API routes or known endpoints
+    if path.startswith(('api/', 'process', 'download/', 'get-tags', 'share-receiver', 'health', 'reprocess')):
+        return jsonify({'error': 'Not found'}), 404
+    # Check if file exists in React build
+    file_path = os.path.join(REACT_BUILD_DIR, path)
+    if os.path.isfile(file_path):
+        return send_from_directory(REACT_BUILD_DIR, path)
+    # Default: serve React app for client-side routing
+    return send_from_directory(REACT_BUILD_DIR, 'index.html')
 
 
 if __name__ == '__main__':
