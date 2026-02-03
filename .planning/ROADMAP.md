@@ -82,11 +82,11 @@ Plans:
   4. User can tap an exercise to play its video
   5. User can edit exercise metadata and see changes saved
   6. User can delete an exercise and see it removed from the list
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: Exercise grid with search and filter
-- [ ] 04-02: Exercise playback, edit, and delete
+- [ ] 04-01-PLAN.md — Exercise store, API functions, grid layout, search and filter
+- [ ] 04-02-PLAN.md — Video autoplay with Intersection Observer, edit dialog, delete dialog
 
 ### Phase 5: PWA Migration
 **Goal**: User can install the app and share videos from gallery directly to it
