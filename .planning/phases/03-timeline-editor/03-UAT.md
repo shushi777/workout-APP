@@ -1,9 +1,10 @@
 ---
 status: complete
 phase: 03-timeline-editor
-source: [03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md, 03-04-SUMMARY.md]
+source: [03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md, 03-04-SUMMARY.md, 03-05-SUMMARY.md]
 started: 2026-02-03T14:00:00Z
-updated: 2026-02-03T14:15:00Z
+updated: 2026-02-03T17:00:00Z
+retest: 2026-02-03T17:00:00Z
 ---
 
 ## Current Test
@@ -18,9 +19,8 @@ result: pass
 
 ### 2. Drag Cut Points to Adjust Timing
 expected: Click and drag any cut point circle on the timeline. As you drag, a time overlay shows the current position. Releasing the drag updates the segment boundaries.
-result: issue
-reported: "cut point move and update but there is a two point for one point"
-severity: major
+result: pass
+retest: "Fixed in 03-05 - single circle visible, no duplicate"
 
 ### 3. Zoom Controls Work
 expected: Using the zoom controls (+ and - buttons), you can zoom in up to 3x for precision editing and zoom out to 0.5x for overview. The timeline stretches/compresses accordingly.
@@ -28,25 +28,22 @@ result: pass
 
 ### 4. Video Player Click to Play/Pause
 expected: Clicking directly on the video player toggles play/pause. An animated play/pause icon overlay appears briefly when toggling. No native browser controls are shown.
-result: issue
-reported: "it plays but not pause"
-severity: major
+result: pass
+retest: "Fixed in 03-05 - play/pause toggles correctly"
 
 ### 5. Segment Preview Playback
-expected: Clicking a segment card (not the canvas) highlights it with an orange ring and starts playing that segment in the main video player. The video automatically loops back to segment start when it reaches segment end.
-result: issue
-reported: "when clicking segment, the main player should not played"
-severity: major
+expected: Clicking a segment card (not the canvas) highlights it with an orange ring. Main player seeks to segment start but stays paused. User can manually play if desired.
+result: pass
+retest: "Fixed in 03-05 - main player no longer auto-plays on segment select"
 
 ### 6. Tap Segment Card Opens Drawer
 expected: Tapping a segment card slides up a bottom sheet drawer. The drawer contains a video preview of the segment, exercise name field, muscle groups chips, equipment chips, and a "remove audio" checkbox.
 result: pass
 
 ### 7. Drawer Video Preview Shows Segment
-expected: Inside the drawer, the video preview plays only the selected segment (not the full video). It should start and end at the segment boundaries.
-result: issue
-reported: "pass but need to adjust the length bar video player to the length of current segment"
-severity: minor
+expected: Inside the drawer, the video preview plays the selected segment with custom controls showing segment-relative time (e.g., "00:05 / 00:12").
+result: pass
+retest: "Fixed in 03-05 - custom seekbar shows segment duration"
 
 ### 8. Autocomplete Chips Work
 expected: Typing in the muscle groups or equipment fields shows autocomplete suggestions from existing tags. Pressing Enter or clicking a suggestion adds it as a chip. Chips can be removed by clicking X.
@@ -67,49 +64,75 @@ result: pass
 ## Summary
 
 total: 11
-passed: 7
-issues: 4
+passed: 11
+issues: 0
 pending: 0
 skipped: 0
 
+### Retest Results (after 03-05 gap closure)
+- Test 2: pass (was: duplicate circles)
+- Test 4: pass (was: play/pause not working)
+- Test 5: pass (was: auto-play on segment select)
+- Test 7: pass (was: drawer showed full video length)
+
 ## Gaps
 
+All gaps closed by 03-05-PLAN.md execution.
+
 - truth: "Cut point shows as single circle when dragging"
-  status: failed
+  status: fixed
   reason: "User reported: cut point move and update but there is a two point for one point"
   severity: major
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Cut points rendered twice - once on Canvas via drawCutPoints() and once as React DOM overlay in DraggableCutPoint.tsx with visible colored circle"
+  artifacts:
+    - path: "frontend/src/hooks/useCanvasTimeline.ts"
+      issue: "drawCutPoints() draws circles at lines 234-243"
+    - path: "frontend/src/components/timeline/DraggableCutPoint.tsx"
+      issue: "Renders duplicate visible 16x16px circle at lines 44-55"
+  missing:
+    - "Make DraggableCutPoint inner circle invisible (keep 44x44 touch target)"
+  debug_session: ".planning/debug/cut-point-duplication.md"
 
 - truth: "Clicking video player toggles play/pause"
-  status: failed
+  status: fixed
   reason: "User reported: it plays but not pause"
   severity: major
   test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "useVideoSegmentPlayback hook unconditionally calls video.play() at lines 27-29 whenever segment is selected, overriding user's pause action"
+  artifacts:
+    - path: "frontend/src/hooks/useVideoSegmentPlayback.ts"
+      issue: "Auto-plays without respecting user pause intent at lines 27-30"
+    - path: "frontend/src/components/timeline/VideoPlayer.tsx"
+      issue: "Uses the hook at line 37"
+  missing:
+    - "Add isPlaying dependency or userPaused flag to prevent auto-resume after manual pause"
+  debug_session: ".planning/debug/video-player-pause.md"
 
 - truth: "Main player should not play when clicking segment card"
-  status: failed
+  status: fixed
   reason: "User reported: when clicking segment, the main player should not played"
   severity: major
   test: 5
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "useVideoSegmentPlayback hook used on main VideoPlayer auto-plays when segment is selected - hook designed for drawer preview, not main player"
+  artifacts:
+    - path: "frontend/src/components/timeline/VideoPlayer.tsx"
+      issue: "Line 37 uses useVideoSegmentPlayback which auto-plays"
+    - path: "frontend/src/hooks/useVideoSegmentPlayback.ts"
+      issue: "Lines 27-30 call video.play() when isActive becomes true"
+  missing:
+    - "Remove useVideoSegmentPlayback from main VideoPlayer or add autoPlay parameter"
+  debug_session: ".planning/debug/main-player-autoplay.md"
 
 - truth: "Drawer video seekbar should show segment length not full video length"
-  status: failed
+  status: fixed
   reason: "User reported: pass but need to adjust the length bar video player to the length of current segment"
   severity: minor
   test: 7
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "SegmentDrawer uses native HTML5 video controls attribute which ignores Media Fragments for UI - always shows full video duration"
+  artifacts:
+    - path: "frontend/src/components/tagging/SegmentDrawer.tsx"
+      issue: "Line 117 uses native controls that show full duration"
+  missing:
+    - "Replace native controls with custom seekbar showing segment-relative time"
+  debug_session: ".planning/debug/drawer-seekbar-full-duration.md"
