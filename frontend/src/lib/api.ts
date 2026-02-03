@@ -100,3 +100,50 @@ export async function getTags(): Promise<TagsResponse> {
   }
   return response.json();
 }
+
+// Types for segment details (matches timelineStore SegmentDetails)
+export interface SegmentDetails {
+  name: string;
+  muscleGroups: string[];
+  equipment: string[];
+  removeAudio: boolean;
+}
+
+export interface SaveTimelineSegment {
+  start: number;
+  end: number;
+  details: SegmentDetails;
+}
+
+export interface SaveTimelineRequest {
+  videoUrl: string;
+  cutPoints: Array<{ time: number; type: string; id: string }>;
+  segments: SaveTimelineSegment[];
+}
+
+export interface SaveTimelineResponse {
+  success: boolean;
+  saved_count: number;
+  message: string;
+}
+
+/**
+ * Save timeline with cut points and exercise segments to the backend.
+ * Backend will cut the video into segments and store them.
+ */
+export async function saveTimeline(data: SaveTimelineRequest): Promise<SaveTimelineResponse> {
+  const response = await fetch('/api/timeline/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to save timeline: ${errorText}`);
+  }
+
+  return response.json();
+}
