@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, Volume2, VolumeX } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -26,11 +26,48 @@ export function SegmentDrawer() {
     selectedSegmentIndex !== null ? segments[selectedSegmentIndex] : null;
   const isOpen = selectedSegmentIndex !== null;
 
+  // Video preview ref and state
+  const drawerVideoRef = useRef<HTMLVideoElement>(null);
+  const [drawerTime, setDrawerTime] = useState(0);
+  const [isDrawerPlaying, setIsDrawerPlaying] = useState(false);
+
   // Local form state
   const [name, setName] = useState('');
   const [muscleGroups, setMuscleGroups] = useState<string[]>([]);
   const [equipment, setEquipment] = useState<string[]>([]);
   const [removeAudio, setRemoveAudio] = useState(false);
+
+  // Drawer video time tracking and segment boundary enforcement
+  useEffect(() => {
+    const video = drawerVideoRef.current;
+    if (!video || !segment) return;
+
+    const handleTimeUpdate = () => {
+      setDrawerTime(video.currentTime);
+      // Stop at segment end and loop back to start
+      if (video.currentTime >= segment.end - 0.1) {
+        video.pause();
+        video.currentTime = segment.start;
+        setDrawerTime(segment.start);
+      }
+    };
+
+    const handlePlay = () => setIsDrawerPlaying(true);
+    const handlePause = () => setIsDrawerPlaying(false);
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+
+    // Initialize time to segment start
+    setDrawerTime(segment.start);
+
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+    };
+  }, [segment]);
 
   // Load existing details when segment changes
   useEffect(() => {
@@ -108,17 +145,63 @@ export function SegmentDrawer() {
 
         <div className="overflow-y-auto p-4 space-y-4">
           {/* Video Preview */}
-          {previewUrl && (
+          {previewUrl && segment && (
             <div className="rounded-lg overflow-hidden bg-black">
               <video
+                ref={drawerVideoRef}
                 key={previewUrl} // Force reload when segment changes
                 src={previewUrl}
-                className="w-full aspect-video object-contain"
-                controls
+                className="w-full aspect-video object-contain cursor-pointer"
                 playsInline
                 autoPlay
                 muted
+                onClick={() => {
+                  const video = drawerVideoRef.current;
+                  if (video) {
+                    isDrawerPlaying ? video.pause() : video.play();
+                  }
+                }}
               />
+              {/* Custom Controls - Segment-relative seekbar */}
+              <div className="bg-black/80 p-2 flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const video = drawerVideoRef.current;
+                    if (video) {
+                      isDrawerPlaying ? video.pause() : video.play();
+                    }
+                  }}
+                  className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 rounded"
+                >
+                  {isDrawerPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                </button>
+                <span className="text-white text-xs min-w-[80px]">
+                  {formatTime(Math.max(0, drawerTime - segment.start))} / {formatTime(segment.end - segment.start)}
+                </span>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={segment.end > segment.start
+                    ? ((drawerTime - segment.start) / (segment.end - segment.start)) * 100
+                    : 0}
+                  onChange={(e) => {
+                    const video = drawerVideoRef.current;
+                    if (video && segment) {
+                      const progress = parseFloat(e.target.value) / 100;
+                      const newTime = segment.start + progress * (segment.end - segment.start);
+                      video.currentTime = newTime;
+                      setDrawerTime(newTime);
+                    }
+                  }}
+                  dir="ltr"
+                  className="flex-1 h-1.5 bg-white/30 rounded-full appearance-none cursor-pointer
+                             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3
+                             [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full
+                             [&::-webkit-slider-thumb]:bg-blue-500"
+                />
+              </div>
             </div>
           )}
 
