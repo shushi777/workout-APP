@@ -3,10 +3,11 @@ import type { Exercise } from '@/lib/api';
 
 interface ExerciseGridProps {
   exercises: Exercise[];
-  onExerciseClick?: (exercise: Exercise) => void;
+  onEdit: (exercise: Exercise) => void;
+  onDelete: (exercise: Exercise) => void;
 }
 
-export function ExerciseGrid({ exercises, onExerciseClick }: ExerciseGridProps) {
+export function ExerciseGrid({ exercises, onEdit, onDelete }: ExerciseGridProps) {
   if (exercises.length === 0) {
     return (
       <div className="text-center py-12">
@@ -24,7 +25,8 @@ export function ExerciseGrid({ exercises, onExerciseClick }: ExerciseGridProps) 
         <ExerciseCard
           key={exercise.id}
           exercise={exercise}
-          onClick={() => onExerciseClick?.(exercise)}
+          onEdit={onEdit}
+          onDelete={onDelete}
         />
       ))}
     </div>
