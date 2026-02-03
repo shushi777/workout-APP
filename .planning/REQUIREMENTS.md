@@ -116,6 +116,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SETUP-04 | Phase 1 | Pending |
 | SETUP-05 | Phase 1 | Pending |
 | SETUP-06 | Phase 1 | Pending |
+| UX-01 | Phase 1 | Pending |
+| UX-02 | Phase 1 | Pending |
+| UX-03 | Phase 1 | Pending |
+| UX-04 | Phase 1 | Pending |
 | UPLOAD-01 | Phase 2 | Pending |
 | UPLOAD-02 | Phase 2 | Pending |
 | UPLOAD-03 | Phase 2 | Pending |
@@ -128,37 +132,33 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EDITOR-05 | Phase 3 | Pending |
 | EDITOR-06 | Phase 3 | Pending |
 | EDITOR-07 | Phase 3 | Pending |
-| TAG-01 | Phase 4 | Pending |
-| TAG-02 | Phase 4 | Pending |
-| TAG-03 | Phase 4 | Pending |
-| TAG-04 | Phase 4 | Pending |
-| TAG-05 | Phase 4 | Pending |
-| TAG-06 | Phase 4 | Pending |
-| TAG-07 | Phase 4 | Pending |
-| TAG-08 | Phase 4 | Pending |
-| SAVE-01 | Phase 4 | Pending |
-| SAVE-02 | Phase 4 | Pending |
-| SAVE-03 | Phase 4 | Pending |
-| LIB-01 | Phase 5 | Pending |
-| LIB-02 | Phase 5 | Pending |
-| LIB-03 | Phase 5 | Pending |
-| LIB-04 | Phase 5 | Pending |
-| LIB-05 | Phase 5 | Pending |
-| LIB-06 | Phase 5 | Pending |
-| LIB-07 | Phase 5 | Pending |
-| UX-01 | Phase 1 | Pending |
-| UX-02 | Phase 1 | Pending |
-| UX-03 | Phase 1 | Pending |
-| UX-04 | Phase 1 | Pending |
-| PWA-01 | Phase 6 | Pending |
-| PWA-02 | Phase 6 | Pending |
-| PWA-03 | Phase 6 | Pending |
+| TAG-01 | Phase 3 | Pending |
+| TAG-02 | Phase 3 | Pending |
+| TAG-03 | Phase 3 | Pending |
+| TAG-04 | Phase 3 | Pending |
+| TAG-05 | Phase 3 | Pending |
+| TAG-06 | Phase 3 | Pending |
+| TAG-07 | Phase 3 | Pending |
+| TAG-08 | Phase 3 | Pending |
+| SAVE-01 | Phase 3 | Pending |
+| SAVE-02 | Phase 3 | Pending |
+| SAVE-03 | Phase 3 | Pending |
+| LIB-01 | Phase 4 | Pending |
+| LIB-02 | Phase 4 | Pending |
+| LIB-03 | Phase 4 | Pending |
+| LIB-04 | Phase 4 | Pending |
+| LIB-05 | Phase 4 | Pending |
+| LIB-06 | Phase 4 | Pending |
+| LIB-07 | Phase 4 | Pending |
+| PWA-01 | Phase 5 | Pending |
+| PWA-02 | Phase 5 | Pending |
+| PWA-03 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 40 total
 - Mapped to phases: 40
-- Unmapped: 0 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 after initial definition*
+*Last updated: 2026-02-03 after roadmap creation*
