@@ -18,11 +18,11 @@ Requirements for the React + Tailwind frontend rebuild. Each maps to roadmap pha
 
 ### Upload Feature
 
-- [ ] **UPLOAD-01**: User can drag-and-drop video file to upload
-- [ ] **UPLOAD-02**: User can tap to select video file from device
-- [ ] **UPLOAD-03**: User sees upload progress indicator
-- [ ] **UPLOAD-04**: User sees processing progress during scene detection
-- [ ] **UPLOAD-05**: User is navigated to Editor tab after processing completes
+- [x] **UPLOAD-01**: User can drag-and-drop video file to upload
+- [x] **UPLOAD-02**: User can tap to select video file from device
+- [x] **UPLOAD-03**: User sees upload progress indicator
+- [x] **UPLOAD-04**: User sees processing progress during scene detection
+- [x] **UPLOAD-05**: User is navigated to Editor tab after processing completes
 
 ### Timeline Editor
 
@@ -120,11 +120,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-02 | Phase 1 | Complete |
 | UX-03 | Phase 1 | Complete |
 | UX-04 | Phase 1 | Complete |
-| UPLOAD-01 | Phase 2 | Pending |
-| UPLOAD-02 | Phase 2 | Pending |
-| UPLOAD-03 | Phase 2 | Pending |
-| UPLOAD-04 | Phase 2 | Pending |
-| UPLOAD-05 | Phase 2 | Pending |
+| UPLOAD-01 | Phase 2 | Complete |
+| UPLOAD-02 | Phase 2 | Complete |
+| UPLOAD-03 | Phase 2 | Complete |
+| UPLOAD-04 | Phase 2 | Complete |
+| UPLOAD-05 | Phase 2 | Complete |
 | EDITOR-01 | Phase 3 | Pending |
 | EDITOR-02 | Phase 3 | Pending |
 | EDITOR-03 | Phase 3 | Pending |

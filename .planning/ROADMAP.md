@@ -11,7 +11,7 @@ Rebuild the workout video editor frontend from vanilla HTML/JS to React + Tailwi
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Foundation & Design System** - React project setup with Tailwind dark theme and mobile UX patterns
-- [ ] **Phase 2: Upload Feature** - Video upload with drag-and-drop and processing status
+- [x] **Phase 2: Upload Feature** - Video upload with drag-and-drop and processing status
 - [ ] **Phase 3: Timeline Editor** - Canvas timeline, video player, segment tagging, and save flow
 - [ ] **Phase 4: Exercise Library** - View, search, filter, play, edit, and delete exercises
 - [ ] **Phase 5: PWA Migration** - Installability, share target, and offline support
@@ -47,7 +47,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 02-01-PLAN.md — Upload infrastructure (api, store, ProgressBar) + DropZone + UploadPage wiring
+- [x] 02-01-PLAN.md — Upload infrastructure (api, store, ProgressBar) + DropZone + UploadPage wiring
 
 ### Phase 3: Timeline Editor
 **Goal**: User can edit cut points, preview segments, tag exercises, and save the timeline
@@ -110,7 +110,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Design System | 2/2 | ✓ Complete | 2026-02-03 |
-| 2. Upload Feature | 0/1 | Not started | - |
+| 2. Upload Feature | 1/1 | ✓ Complete | 2026-02-03 |
 | 3. Timeline Editor | 0/4 | Not started | - |
 | 4. Exercise Library | 0/2 | Not started | - |
 | 5. PWA Migration | 0/2 | Not started | - |
