@@ -49,6 +49,7 @@ interface TimelineState {
   addCutPoint: (time: number) => void;
   updateCutPoint: (id: string, newTime: number) => void;
   deleteCutPoint: (id: string) => void;
+  clearAllCutPoints: () => void;
   selectCutPoint: (id: string | null) => void;
   selectSegment: (index: number | null) => void;
   updateSegmentDetails: (index: number, details: SegmentDetails | null) => void;
@@ -241,6 +242,18 @@ export const useTimelineStore = create<TimelineState>()((set, get) => ({
       cutPoints: newCutPoints,
       segments: newSegments,
       selectedCutPointId: selectedCutPointId === id ? null : selectedCutPointId,
+    });
+  },
+
+  clearAllCutPoints: () => {
+    const { videoDuration } = get();
+
+    const newSegments = getSegmentsFromCutPoints([], videoDuration, []);
+
+    set({
+      cutPoints: [],
+      segments: newSegments,
+      selectedCutPointId: null,
     });
   },
 

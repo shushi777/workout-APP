@@ -1,17 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTimelineStore } from '@/stores/timelineStore';
 import { TimelineCanvas, VideoPlayer, SaveFlow } from '@/components/timeline';
 import { Button } from '@/components/ui/Button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { getTags } from '@/lib/api';
 import { formatTime } from '@/hooks/useCanvasTimeline';
 import { cn } from '@/lib/utils';
-import { Scissors, Check, X } from 'lucide-react';
+import { Scissors, Check, X, Trash2 } from 'lucide-react';
 import { SegmentDrawer } from '@/components/tagging/SegmentDrawer';
 
 export function EditorPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Get URL parameters
   const videoUrl = searchParams.get('video');
@@ -22,9 +31,11 @@ export function EditorPage() {
     videoDuration,
     currentTime,
     segments,
+    cutPoints,
     selectedSegmentIndex,
     loadVideo,
     addCutPoint,
+    clearAllCutPoints,
     selectSegment,
     loadExistingTags,
   } = useTimelineStore();
@@ -111,6 +122,12 @@ export function EditorPage() {
             <Scissors className="w-4 h-4 ml-1" />
             הוסף חיתוך
           </Button>
+          {cutPoints.length > 0 && (
+            <Button onClick={() => setShowDeleteConfirm(true)} variant="ghost" size="sm">
+              <Trash2 className="w-4 h-4 ml-1" />
+              מחק הכל
+            </Button>
+          )}
           <SaveFlow />
         </div>
       </div>
@@ -212,6 +229,37 @@ export function EditorPage() {
 
       {/* Segment Tagging Drawer */}
       <SegmentDrawer />
+
+      {/* Delete All Confirmation Dialog */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className="bg-gray-800 border-gray-700" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-gray-100">מחיקת כל נקודות החיתוך</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              האם אתה בטוח שברצונך למחוק את כל {cutPoints.length} נקודות החיתוך?
+              פעולה זו לא ניתנת לביטול.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:flex-row-reverse">
+            <Button
+              variant="primary"
+              onClick={() => {
+                clearAllCutPoints();
+                setShowDeleteConfirm(false);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              מחק הכל
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => setShowDeleteConfirm(false)}
+            >
+              ביטול
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
