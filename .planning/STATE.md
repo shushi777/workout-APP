@@ -9,29 +9,30 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-Phase: 1 of 5 (Foundation & Design System)
-Plan: 2 of 2 in current phase
+Phase: 2 of 5 (Upload Feature)
+Plan: 1 of 1 in current phase
 Status: Phase complete
-Last activity: 2026-02-03 - Completed 01-02-PLAN.md (App Shell with Bottom Tab Navigation)
+Last activity: 2026-02-03 - Completed 02-01-PLAN.md (Upload Feature)
 
-Progress: [██░░░░░░░░] 20%
+Progress: [███░░░░░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 5.5 min
-- Total execution time: 0.18 hours
+- Total plans completed: 3
+- Average duration: 5 min
+- Total execution time: 0.25 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 11min | 5.5min |
+| 02-upload-feature | 1 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (6min), 01-02 (5min)
-- Trend: Stable
+- Last 5 plans: 01-01 (6min), 01-02 (5min), 02-01 (4min)
+- Trend: Improving
 
 *Updated after each plan completion*
 
@@ -50,6 +51,9 @@ Recent decisions affecting current work:
 | 2026-02-03 | 01-02 | 44px minimum touch targets for WCAG AAA | Accessibility compliance |
 | 2026-02-03 | 01-02 | Zustand for UI state management | Lightweight alternative to Redux |
 | 2026-02-03 | 01-02 | cn() utility pattern (clsx + tailwind-merge) | Standard shadcn/ui approach |
+| 2026-02-03 | 02-01 | XMLHttpRequest over fetch for upload progress | fetch API doesn't support upload progress tracking |
+| 2026-02-03 | 02-01 | react-dropzone for drag-drop file handling | Battle-tested library with validation, better than custom |
+| 2026-02-03 | 02-01 | Upload abort pattern with useRef cleanup | Prevents memory leaks, ensures XHR abort on unmount |
 
 ### Pending Todos
 
@@ -61,29 +65,28 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-03T10:27:00Z
-Stopped at: Completed 01-02-PLAN.md (App Shell with Bottom Tab Navigation)
+Last session: 2026-02-03T11:09:28Z
+Stopped at: Completed 02-01-PLAN.md (Upload Feature)
 Resume file: None
 
-Previous plan summary (01-02):
-# Phase 01 Plan 02: App Shell with Bottom Tab Navigation Summary
+Previous plan summary (02-01):
+# Phase 02 Plan 01: Upload Feature Summary
 
-**React Router SPA with fixed bottom tab navigation, three placeholder pages, and reusable Button component with 44px touch targets**
+**Video upload with drag-drop, XHR progress tracking, and automatic Editor navigation using react-dropzone and Zustand**
 
 ## Accomplishments
-- Created cn() utility for Tailwind class merging (clsx + tailwind-merge)
-- Built Button component with 44px minimum touch targets (WCAG AAA)
-- Implemented BottomNav with NavLink active state highlighting (blue)
-- Set up BrowserRouter with three routes (/, /editor, /library)
-- Created Zustand uiStore for UI state management
+- Drag-and-drop video upload with file validation (500MB limit, MP4/MOV/AVI/MKV)
+- Real XHR upload progress tracking with percent display
+- Upload state management with Zustand (idle, uploading, processing, complete, error)
+- Automatic navigation to /editor with video URL and suggested cuts after processing
+- Hebrew UI with RTL support throughout upload flow
 
 ## Task Commits
-1. **Task 1: Create utility functions and base UI components** - `a5810bb` (feat)
-2. **Task 2: Create Zustand store and page components** - `4e84b91` (feat)
-3. **Task 3: Create BottomNav and wire up App routing** - `1c23961` (feat)
+1. **Task 1: Create upload infrastructure (api, store, ProgressBar)** - `a1964f3` (feat)
+2. **Task 2: Create DropZone component with react-dropzone** - `7854f03` (feat)
+3. **Task 3: Wire up UploadPage with complete upload flow** - `257c69f` (feat)
 
 ## Patterns Established
-- "cn() utility: Always use cn() for conditional Tailwind classes"
-- "Touch targets: All interactive elements min-h-[44px] min-w-[44px]"
-- "Component pattern: forwardRef with displayName for UI components"
-- "NavLink pattern: end={to === '/'} for root route exact matching"
+- "Upload abort pattern: useRef with cleanup on unmount"
+- "Progress transitions: uploading (0-99%) → processing (100%) → complete"
+- "Hebrew RTL UI with text-right alignment throughout"
