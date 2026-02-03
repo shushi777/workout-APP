@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Smooth, responsive mobile experience for editing workout videos
-**Current focus:** Phase 3 - Timeline Editor (COMPLETE with UAT gaps closed)
+**Current focus:** Phase 5 - PWA Migration (In Progress)
 
 ## Current Position
 
-Phase: 4 of 5 (Exercise Library)
-Plan: 2 of 2 in current phase (complete)
-Status: Phase complete
-Last activity: 2026-02-03 - Completed 04-02-PLAN.md (Video Playback & Exercise CRUD)
+Phase: 5 of 5 (PWA Migration)
+Plan: 1 of 2 in current phase (complete)
+Status: In progress
+Last activity: 2026-02-03 - Completed 05-01-PLAN.md (PWA Core Configuration)
 
-Progress: [██████████] 100%
+Progress: [███████████░] 92%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 5.3 min
-- Total execution time: 0.88 hours
+- Total plans completed: 11
+- Average duration: 5.4 min
+- Total execution time: 0.99 hours
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [██████████] 100%
 | 02-upload-feature | 1 | 4min | 4min |
 | 03-timeline-editor | 5 | 28min | 5.6min |
 | 04-exercise-library | 2 | 10min | 5min |
+| 05-pwa-migration | 1 | 6min | 6min |
 
 **Recent Trend:**
-- Last 5 plans: 03-03 (7min), 03-04 (4min), 03-05 (4min), 04-01 (6min), 04-02 (4min)
+- Last 5 plans: 03-04 (4min), 03-05 (4min), 04-01 (6min), 04-02 (4min), 05-01 (6min)
 - Trend: Stable, efficient execution
 
 *Updated after each plan completion*
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 | 2026-02-03 | 04-02 | Intersection Observer threshold: 0.5 | Triggers autoplay when video is meaningfully visible |
 | 2026-02-03 | 04-02 | Video attributes: muted, playsInline, loop | Required for browser autoplay policies and iOS support |
 | 2026-02-03 | 04-02 | Delete dialog shows exercise info | User confirms correct exercise before permanent deletion |
+| 2026-02-03 | 05-01 | injectManifest strategy for custom SW | Required for Share Target in 05-02 |
+| 2026-02-03 | 05-01 | Workbox caching: NetworkFirst for API/videos, CacheFirst for images | Balances freshness with performance |
+| 2026-02-03 | 05-01 | Hourly SW update check | Reasonable balance between freshness and battery/network |
 
 ### Pending Todos
 
@@ -82,31 +86,32 @@ None.
 
 ### Blockers/Concerns
 
-- Phase 5 (PWA): Share Target + React SPA requires careful service worker configuration. Research flagged this as needing a spike/prototype.
+- Phase 5 (PWA): Share Target + React SPA requires careful service worker configuration. Research flagged this as needing a spike/prototype. Plan 05-01 established foundation.
 
 ## Session Continuity
 
-Last session: 2026-02-03T17:54:25Z
-Stopped at: Completed 04-02-PLAN.md (Video Playback & Exercise CRUD) - Phase 4 COMPLETE
+Last session: 2026-02-03T21:17:00Z
+Stopped at: Completed 05-01-PLAN.md (PWA Core Configuration)
 Resume file: None
 
-Previous plan summary (04-02):
-# Phase 04 Plan 02: Video Playback & Exercise CRUD Summary
+Previous plan summary (05-01):
+# Phase 05 Plan 01: PWA Core Configuration Summary
 
-**Exercise library with video autoplay on scroll, edit dialog, and delete confirmation**
+**VitePWA with injectManifest strategy, Workbox caching, and update notification UI**
 
 ## Accomplishments
-- Exercise cards support click-to-play video with scroll-triggered autoplay
-- Videos autoplay when 50% visible, pause when scrolled out of view
-- Edit dialog allows modifying exercise name, muscle groups, and equipment
-- Delete dialog shows warning and exercise info before permanent deletion
+- VitePWA plugin configured with injectManifest for custom service worker support
+- Custom service worker with Workbox caching strategies for API, videos, images, and fonts
+- PWA manifest with app identity (name, description, colors, icons)
+- UpdatePrompt component shows offline ready and update available notifications
 
 ## Task Commits
-1. **Task 1: Add shadcn Dialog component** - `96700c9` (feat)
-2. **Task 2: Update ExerciseCard with video autoplay on scroll** - `eb515b9` (feat)
-3. **Task 3: Create EditExerciseDialog and DeleteConfirmDialog** - `08b543e` (feat)
+1. **Task 1: Install vite-plugin-pwa and Workbox dependencies** - `100d4b9` (chore)
+2. **Task 2: Configure VitePWA plugin with injectManifest strategy** - `2d1f5ed` (feat)
+3. **Task 3: Create custom service worker with Workbox precaching** - `37a142a` (feat)
+4. **Task 4: Create UpdatePrompt component and add to App** - `92fad37` (feat)
 
 ## Patterns Established
-- "Intersection Observer for scroll-triggered autoplay with 0.5 threshold"
-- "Dialog state management: separate open/close handlers for edit and delete"
-- "Video autoplay attributes: muted, playsInline, loop for browser compatibility"
+- "useRegisterSW hook: Handles SW registration, offline ready state, and update prompts"
+- "Custom SW with precacheAndRoute: App shell cached automatically by Vite PWA"
+- "UpdatePrompt component: Bottom-positioned notification for offline/update states"
