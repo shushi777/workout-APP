@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTimelineStore } from '@/stores/timelineStore';
-import { TimelineCanvas } from '@/components/timeline';
+import { TimelineCanvas, VideoPlayer } from '@/components/timeline';
 import { Button } from '@/components/ui/Button';
 import { getTags } from '@/lib/api';
 import { formatTime } from '@/hooks/useCanvasTimeline';
-import { Scissors, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Scissors, Check, X } from 'lucide-react';
 
 export function EditorPage() {
   const [searchParams] = useSearchParams();
@@ -19,8 +20,10 @@ export function EditorPage() {
     videoDuration,
     currentTime,
     segments,
+    selectedSegmentIndex,
     loadVideo,
     addCutPoint,
+    selectSegment,
     loadExistingTags,
   } = useTimelineStore();
 
@@ -109,17 +112,18 @@ export function EditorPage() {
         </div>
       </div>
 
-      {/* Video placeholder - Plan 02 will implement video player */}
-      <div className="bg-black rounded-xl aspect-video flex items-center justify-center">
-        {videoDuration > 0 ? (
-          <video
-            src={videoUrl}
-            className="w-full h-full rounded-xl"
-            controls
-            playsInline
-          />
-        ) : (
-          <span className="text-gray-500">Loading video...</span>
+      {/* Video Player with segment preview */}
+      <div className="relative">
+        <VideoPlayer />
+        {/* Close preview button when segment selected */}
+        {selectedSegmentIndex !== null && (
+          <button
+            onClick={() => selectSegment(null)}
+            className="absolute top-2 left-2 z-10 bg-gray-900/80 hover:bg-gray-800 text-white rounded-full p-2 transition-colors"
+            aria-label="סגור תצוגה מקדימה"
+          >
+            <X className="w-4 h-4" />
+          </button>
         )}
       </div>
 
@@ -139,12 +143,16 @@ export function EditorPage() {
           segments.map((seg, i) => (
             <div
               key={i}
-              className={`
-                bg-gray-800 rounded-lg p-3 text-right
-                border-2 transition-colors cursor-pointer
-                ${seg.details ? 'border-green-600' : 'border-transparent'}
-                hover:border-gray-600
-              `}
+              onClick={() => selectSegment(i)}
+              className={cn(
+                "bg-gray-800 rounded-lg p-3 text-right cursor-pointer transition-all",
+                "border-2",
+                selectedSegmentIndex === i
+                  ? "ring-2 ring-orange-500 bg-gray-700 border-orange-500"
+                  : seg.details
+                    ? "border-green-600 hover:border-green-500"
+                    : "border-transparent hover:border-gray-600"
+              )}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
