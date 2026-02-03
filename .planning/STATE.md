@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 3 of 5 (Timeline Editor)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-03 - Completed 03-02-PLAN.md (Video Player)
+Last activity: 2026-02-03 - Completed 03-03-PLAN.md (Segment Tagging Drawer)
 
-Progress: [██████░░░░] 60%
+Progress: [███████░░░] 70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 6 min
-- Total execution time: 0.5 hours
+- Total plans completed: 6
+- Average duration: 6.3 min
+- Total execution time: 0.6 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [██████░░░░] 60%
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 11min | 5.5min |
 | 02-upload-feature | 1 | 4min | 4min |
-| 03-timeline-editor | 2 | 13min | 6.5min |
+| 03-timeline-editor | 3 | 20min | 6.7min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (5min), 02-01 (4min), 03-01 (8min), 03-02 (5min)
+- Last 5 plans: 02-01 (4min), 03-01 (8min), 03-02 (5min), 03-03 (7min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -60,6 +60,9 @@ Recent decisions affecting current work:
 | 2026-02-03 | 03-01 | Zoom range: 0.5x to 3.0x with 0.5 steps | Sufficient for both overview and precision editing |
 | 2026-02-03 | 03-02 | Video loop uses 0.1s buffer before segment end | timeupdate fires ~250ms, ensures boundary is caught |
 | 2026-02-03 | 03-02 | Video event listener cleanup with useRef pattern | Prevents memory leaks on segment/unmount changes |
+| 2026-02-03 | 03-03 | Custom autocomplete over MUI | Avoid heavy dependency and theme conflicts |
+| 2026-02-03 | 03-03 | Media Fragments URI for video preview | Native browser support, no custom controls needed |
+| 2026-02-03 | 03-03 | vaul-based drawer | Swipe-to-dismiss, accessibility built-in |
 
 ### Pending Todos
 
@@ -71,27 +74,27 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-03T13:30:00Z
-Stopped at: Completed 03-02-PLAN.md (Video Player)
+Last session: 2026-02-03T13:38:00Z
+Stopped at: Completed 03-03-PLAN.md (Segment Tagging Drawer)
 Resume file: None
 
-Previous plan summary (03-02):
-# Phase 03 Plan 02: Video Player Summary
+Previous plan summary (03-03):
+# Phase 03 Plan 03: Segment Tagging Drawer Summary
 
-**Custom video player with click-to-play/pause, LTR seekbar, and segment preview looping via useVideoSegmentPlayback hook**
+**Bottom sheet drawer with exercise form, autocomplete chips, video preview using Media Fragments, and vaul-based swipe gestures**
 
 ## Accomplishments
-- Created useVideoSegmentPlayback hook with proper event listener cleanup pattern
-- Built VideoPlayer component with no native controls, animated play/pause icon overlay
-- Integrated segment preview: clicking segment card activates playback loop within segment boundaries
-- Added segment selection highlighting with orange ring on cards
+- Installed shadcn/ui with vaul-based Drawer component for mobile bottom sheet
+- Built custom AutocompleteChips component with keyboard navigation
+- Created SegmentDrawer with video preview, exercise form, and audio toggle
+- Integrated drawer into EditorPage with segment selection
 
 ## Task Commits
-1. **Task 1: Create useVideoSegmentPlayback hook** - `3a87b8b` (feat)
-2. **Task 2: Create VideoPlayer component** - `77fb774` (feat)
-3. **Task 3: Wire VideoPlayer and segment click handling** - `a718a8e` (feat)
+1. **Task 1: Install shadcn/ui Drawer component** - `33d295a` (feat)
+2. **Task 2: Create AutocompleteChips component** - `96aefd3` (feat)
+3. **Task 3: Create SegmentDrawer component** - `e686480` (feat)
 
 ## Patterns Established
-- "Video event listener cleanup: store listener in useRef, cleanup on unmount/change"
-- "Segment playback mode: isActive prop enables/disables hook behavior"
-- "Segment selection: orange ring highlight with ring-2 ring-orange-500"
+- "Drawer form pattern: Local state + sync to store on save"
+- "Video preview with key prop: Force reload on segment change"
+- "Autocomplete chips: Custom lightweight alternative to MUI"
