@@ -96,11 +96,11 @@ Plans:
   1. User can install the app to home screen on mobile device
   2. User can share a video from gallery and have it open in the app for processing
   3. App shell is cached for offline access (basic offline support)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: PWA manifest and service worker with vite-plugin-pwa
-- [ ] 05-02: Share target handler with service worker interception
+- [ ] 05-01-PLAN.md — VitePWA plugin config, custom service worker, app icons, update prompt
+- [ ] 05-02-PLAN.md — Web Share Target handler with IndexedDB storage and React integration
 
 ## Progress
 
