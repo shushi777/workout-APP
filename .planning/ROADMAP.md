@@ -44,10 +44,10 @@ Plans:
   3. User sees upload progress bar while video transfers
   4. User sees processing status while scene detection runs
   5. User is automatically navigated to Editor tab after processing completes
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 02-01: Upload component with drag-and-drop and progress
+- [ ] 02-01-PLAN.md — Upload infrastructure (api, store, ProgressBar) + DropZone + UploadPage wiring
 
 ### Phase 3: Timeline Editor
 **Goal**: User can edit cut points, preview segments, tag exercises, and save the timeline
