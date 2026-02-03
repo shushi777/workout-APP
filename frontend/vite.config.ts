@@ -37,6 +37,19 @@ export default defineConfig({
             purpose: 'any maskable',
           },
         ],
+        share_target: {
+          action: '/share-receiver',
+          method: 'POST',
+          enctype: 'multipart/form-data',
+          params: {
+            files: [
+              {
+                name: 'video',
+                accept: ['video/*'],
+              },
+            ],
+          },
+        },
       },
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
