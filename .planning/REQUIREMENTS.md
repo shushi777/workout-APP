@@ -53,13 +53,13 @@ Requirements for the React + Tailwind frontend rebuild. Each maps to roadmap pha
 
 ### Exercise Library
 
-- [ ] **LIB-01**: User can view all saved exercises in grid layout
-- [ ] **LIB-02**: User can search exercises by name
-- [ ] **LIB-03**: User can filter exercises by muscle groups
-- [ ] **LIB-04**: User can filter exercises by equipment
-- [ ] **LIB-05**: User can tap exercise to play video
-- [ ] **LIB-06**: User can edit exercise metadata
-- [ ] **LIB-07**: User can delete exercise
+- [x] **LIB-01**: User can view all saved exercises in grid layout
+- [x] **LIB-02**: User can search exercises by name
+- [x] **LIB-03**: User can filter exercises by muscle groups
+- [x] **LIB-04**: User can filter exercises by equipment
+- [x] **LIB-05**: User can tap exercise to play video
+- [x] **LIB-06**: User can edit exercise metadata
+- [x] **LIB-07**: User can delete exercise
 
 ### Mobile UX
 
@@ -143,13 +143,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SAVE-01 | Phase 3 | Complete |
 | SAVE-02 | Phase 3 | Complete |
 | SAVE-03 | Phase 3 | Complete |
-| LIB-01 | Phase 4 | Pending |
-| LIB-02 | Phase 4 | Pending |
-| LIB-03 | Phase 4 | Pending |
-| LIB-04 | Phase 4 | Pending |
-| LIB-05 | Phase 4 | Pending |
-| LIB-06 | Phase 4 | Pending |
-| LIB-07 | Phase 4 | Pending |
+| LIB-01 | Phase 4 | Complete |
+| LIB-02 | Phase 4 | Complete |
+| LIB-03 | Phase 4 | Complete |
+| LIB-04 | Phase 4 | Complete |
+| LIB-05 | Phase 4 | Complete |
+| LIB-06 | Phase 4 | Complete |
+| LIB-07 | Phase 4 | Complete |
 | PWA-01 | Phase 5 | Pending |
 | PWA-02 | Phase 5 | Pending |
 | PWA-03 | Phase 5 | Pending |
