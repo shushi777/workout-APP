@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 3 of 5 (Timeline Editor)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-03 - Completed 03-01-PLAN.md (Canvas Timeline Core)
+Last activity: 2026-02-03 - Completed 03-02-PLAN.md (Video Player)
 
-Progress: [█████░░░░░] 50%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 6 min
-- Total execution time: 0.4 hours
+- Total execution time: 0.5 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [█████░░░░░] 50%
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 11min | 5.5min |
 | 02-upload-feature | 1 | 4min | 4min |
-| 03-timeline-editor | 1 | 8min | 8min |
+| 03-timeline-editor | 2 | 13min | 6.5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (6min), 01-02 (5min), 02-01 (4min), 03-01 (8min)
-- Trend: Stable (03-01 larger scope)
+- Last 5 plans: 01-02 (5min), 02-01 (4min), 03-01 (8min), 03-02 (5min)
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -58,6 +58,8 @@ Recent decisions affecting current work:
 | 2026-02-03 | 03-01 | dnd-kit sensors: MouseSensor (5px) + TouchSensor (100ms) | Prevents accidental drags while remaining responsive |
 | 2026-02-03 | 03-01 | Segment detail preservation: 1s tolerance, 80% overlap | Preserves exercise details when cut points adjusted |
 | 2026-02-03 | 03-01 | Zoom range: 0.5x to 3.0x with 0.5 steps | Sufficient for both overview and precision editing |
+| 2026-02-03 | 03-02 | Video loop uses 0.1s buffer before segment end | timeupdate fires ~250ms, ensures boundary is caught |
+| 2026-02-03 | 03-02 | Video event listener cleanup with useRef pattern | Prevents memory leaks on segment/unmount changes |
 
 ### Pending Todos
 
@@ -69,30 +71,27 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-03T13:22:00Z
-Stopped at: Completed 03-01-PLAN.md (Canvas Timeline Core)
+Last session: 2026-02-03T13:30:00Z
+Stopped at: Completed 03-02-PLAN.md (Video Player)
 Resume file: None
 
-Previous plan summary (03-01):
-# Phase 03 Plan 01: Canvas Timeline Core Summary
+Previous plan summary (03-02):
+# Phase 03 Plan 02: Video Player Summary
 
-**Canvas timeline with dnd-kit drag-and-drop, Zustand state management, and high-DPI rendering supporting cut point manipulation and zoom controls**
+**Custom video player with click-to-play/pause, LTR seekbar, and segment preview looping via useVideoSegmentPlayback hook**
 
 ## Accomplishments
-- Created timelineStore with Zustand for complete timeline state management
-- Implemented useCanvasTimeline hook with devicePixelRatio scaling for retina displays
-- Built TimelineCanvas component with DndContext, draggable cut points, and zoom controls
-- Wired EditorPage to parse URL params and initialize timeline from upload flow
-- Added getTags API for fetching existing tags for future autocomplete
+- Created useVideoSegmentPlayback hook with proper event listener cleanup pattern
+- Built VideoPlayer component with no native controls, animated play/pause icon overlay
+- Integrated segment preview: clicking segment card activates playback loop within segment boundaries
+- Added segment selection highlighting with orange ring on cards
 
 ## Task Commits
-1. **Task 1: Install dnd-kit and create timelineStore** - `3cea0ee` (feat)
-2. **Task 2a: Create useCanvasTimeline hook** - `0745691` (feat)
-3. **Task 2b: Create TimelineCanvas component with dnd-kit** - `e46c9e1` (feat)
-4. **Task 3: Wire EditorPage with URL params and timeline** - `d6b2f26` (feat)
+1. **Task 1: Create useVideoSegmentPlayback hook** - `3a87b8b` (feat)
+2. **Task 2: Create VideoPlayer component** - `77fb774` (feat)
+3. **Task 3: Wire VideoPlayer and segment click handling** - `a718a8e` (feat)
 
 ## Patterns Established
-- "Canvas rendering with devicePixelRatio scaling and resize observer"
-- "DndContext with MouseSensor (5px) and TouchSensor (100ms delay)"
-- "Segment regeneration with detail preservation (1s tolerance)"
-- "URL-based state initialization: parse params, load metadata, init store"
+- "Video event listener cleanup: store listener in useRef, cleanup on unmount/change"
+- "Segment playback mode: isActive prop enables/disables hook behavior"
+- "Segment selection: orange ring highlight with ring-2 ring-orange-500"
