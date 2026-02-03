@@ -14,7 +14,7 @@ Rebuild the workout video editor frontend from vanilla HTML/JS to React + Tailwi
 - [x] **Phase 2: Upload Feature** - Video upload with drag-and-drop and processing status
 - [x] **Phase 3: Timeline Editor** - Canvas timeline, video player, segment tagging, and save flow
 - [x] **Phase 4: Exercise Library** - View, search, filter, play, edit, and delete exercises
-- [ ] **Phase 5: PWA Migration** - Installability, share target, and offline support
+- [x] **Phase 5: PWA Migration** - Installability, share target, and offline support
 
 ## Phase Details
 
@@ -99,8 +99,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — VitePWA plugin config, custom service worker, app icons, update prompt
-- [ ] 05-02-PLAN.md — Web Share Target handler with IndexedDB storage and React integration
+- [x] 05-01-PLAN.md — VitePWA plugin config, custom service worker, app icons, update prompt
+- [x] 05-02-PLAN.md — Web Share Target handler with IndexedDB storage and React integration
 
 ## Progress
 
@@ -113,4 +113,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Upload Feature | 1/1 | ✓ Complete | 2026-02-03 |
 | 3. Timeline Editor | 4/4 | ✓ Complete | 2026-02-03 |
 | 4. Exercise Library | 2/2 | ✓ Complete | 2026-02-03 |
-| 5. PWA Migration | 0/2 | Not started | - |
+| 5. PWA Migration | 2/2 | ✓ Complete | 2026-02-03 |
