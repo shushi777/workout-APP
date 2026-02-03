@@ -9,12 +9,12 @@ Requirements for the React + Tailwind frontend rebuild. Each maps to roadmap pha
 
 ### Setup & Infrastructure
 
-- [ ] **SETUP-01**: Vite + React 19 + TypeScript project initialized
-- [ ] **SETUP-02**: Tailwind CSS 4 configured with dark theme
-- [ ] **SETUP-03**: Zustand state management configured
-- [ ] **SETUP-04**: React Router with tab-based navigation (Upload | Editor | Library)
-- [ ] **SETUP-05**: Flask API proxy configured for development
-- [ ] **SETUP-06**: Production build outputs to Flask static folder
+- [x] **SETUP-01**: Vite + React 19 + TypeScript project initialized
+- [x] **SETUP-02**: Tailwind CSS 4 configured with dark theme
+- [x] **SETUP-03**: Zustand state management configured
+- [x] **SETUP-04**: React Router with tab-based navigation (Upload | Editor | Library)
+- [x] **SETUP-05**: Flask API proxy configured for development
+- [x] **SETUP-06**: Production build outputs to Flask static folder
 
 ### Upload Feature
 
@@ -63,10 +63,10 @@ Requirements for the React + Tailwind frontend rebuild. Each maps to roadmap pha
 
 ### Mobile UX
 
-- [ ] **UX-01**: All interactive elements have 44px+ touch targets
-- [ ] **UX-02**: Tab navigation is fixed at bottom of screen
-- [ ] **UX-03**: Dark theme with lighter UI elements throughout
-- [ ] **UX-04**: RTL layout support for Hebrew text
+- [x] **UX-01**: All interactive elements have 44px+ touch targets
+- [x] **UX-02**: Tab navigation is fixed at bottom of screen
+- [x] **UX-03**: Dark theme with lighter UI elements throughout
+- [x] **UX-04**: RTL layout support for Hebrew text
 
 ### PWA
 
@@ -110,16 +110,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 | Phase 1 | Pending |
-| SETUP-02 | Phase 1 | Pending |
-| SETUP-03 | Phase 1 | Pending |
-| SETUP-04 | Phase 1 | Pending |
-| SETUP-05 | Phase 1 | Pending |
-| SETUP-06 | Phase 1 | Pending |
-| UX-01 | Phase 1 | Pending |
-| UX-02 | Phase 1 | Pending |
-| UX-03 | Phase 1 | Pending |
-| UX-04 | Phase 1 | Pending |
+| SETUP-01 | Phase 1 | Complete |
+| SETUP-02 | Phase 1 | Complete |
+| SETUP-03 | Phase 1 | Complete |
+| SETUP-04 | Phase 1 | Complete |
+| SETUP-05 | Phase 1 | Complete |
+| SETUP-06 | Phase 1 | Complete |
+| UX-01 | Phase 1 | Complete |
+| UX-02 | Phase 1 | Complete |
+| UX-03 | Phase 1 | Complete |
+| UX-04 | Phase 1 | Complete |
 | UPLOAD-01 | Phase 2 | Pending |
 | UPLOAD-02 | Phase 2 | Pending |
 | UPLOAD-03 | Phase 2 | Pending |

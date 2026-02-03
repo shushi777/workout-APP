@@ -10,7 +10,7 @@ Rebuild the workout video editor frontend from vanilla HTML/JS to React + Tailwi
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Foundation & Design System** - React project setup with Tailwind dark theme and mobile UX patterns
+- [x] **Phase 1: Foundation & Design System** - React project setup with Tailwind dark theme and mobile UX patterns
 - [ ] **Phase 2: Upload Feature** - Video upload with drag-and-drop and processing status
 - [ ] **Phase 3: Timeline Editor** - Canvas timeline, video player, segment tagging, and save flow
 - [ ] **Phase 4: Exercise Library** - View, search, filter, play, edit, and delete exercises
@@ -31,8 +31,8 @@ Rebuild the workout video editor frontend from vanilla HTML/JS to React + Tailwi
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Vite + React + TypeScript + Tailwind setup with Flask proxy
-- [ ] 01-02-PLAN.md — App shell with tab navigation, Button component, and Zustand stores
+- [x] 01-01-PLAN.md — Vite + React + TypeScript + Tailwind setup with Flask proxy
+- [x] 01-02-PLAN.md — App shell with tab navigation, Button component, and Zustand stores
 
 ### Phase 2: Upload Feature
 **Goal**: User can upload a video and see it processed for scene detection
@@ -109,7 +109,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Design System | 0/2 | Planned | - |
+| 1. Foundation & Design System | 2/2 | ✓ Complete | 2026-02-03 |
 | 2. Upload Feature | 0/1 | Not started | - |
 | 3. Timeline Editor | 0/4 | Not started | - |
 | 4. Exercise Library | 0/2 | Not started | - |
