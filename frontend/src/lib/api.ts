@@ -83,3 +83,20 @@ export function uploadVideoWithProgress(
   // Return abort function
   return () => xhr.abort();
 }
+
+// Response type for getTags API
+export interface TagsResponse {
+  muscle_groups: string[];
+  equipment: string[];
+}
+
+/**
+ * Fetch existing tags (muscle groups and equipment) for autocomplete
+ */
+export async function getTags(): Promise<TagsResponse> {
+  const response = await fetch('/get-tags');
+  if (!response.ok) {
+    throw new Error('Failed to fetch tags');
+  }
+  return response.json();
+}

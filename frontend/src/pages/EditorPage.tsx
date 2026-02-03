@@ -1,13 +1,195 @@
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useTimelineStore } from '@/stores/timelineStore';
+import { TimelineCanvas } from '@/components/timeline';
+import { Button } from '@/components/ui/Button';
+import { getTags } from '@/lib/api';
+import { formatTime } from '@/hooks/useCanvasTimeline';
+import { Scissors, Check } from 'lucide-react';
+
 export function EditorPage() {
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Timeline Editor</h1>
-      <p className="text-gray-400">
-        Edit your video segments here. Canvas timeline will appear after uploading a video.
-      </p>
-      <div className="mt-6 bg-gray-900 rounded-xl p-8 text-center">
-        <p className="text-gray-500">Timeline canvas placeholder</p>
+  const [searchParams] = useSearchParams();
+
+  // Get URL parameters
+  const videoUrl = searchParams.get('video');
+  const cutsParam = searchParams.get('cuts');
+
+  // Timeline store
+  const {
+    videoDuration,
+    currentTime,
+    segments,
+    loadVideo,
+    addCutPoint,
+    loadExistingTags,
+  } = useTimelineStore();
+
+  // Load video metadata and initialize store
+  useEffect(() => {
+    if (!videoUrl) return;
+
+    // Create video element to get duration
+    const video = document.createElement('video');
+    video.src = videoUrl;
+    video.preload = 'metadata';
+
+    video.onloadedmetadata = () => {
+      const suggestedCuts = cutsParam
+        ? cutsParam.split(',').map((s) => parseFloat(s.trim())).filter((n) => !isNaN(n))
+        : [];
+
+      loadVideo(videoUrl, video.duration, suggestedCuts);
+    };
+
+    video.onerror = () => {
+      console.error('[EditorPage] Failed to load video metadata');
+    };
+
+    return () => {
+      video.src = '';
+    };
+  }, [videoUrl, cutsParam, loadVideo]);
+
+  // Load existing tags on mount
+  useEffect(() => {
+    getTags()
+      .then((tags) => {
+        loadExistingTags({
+          muscleGroups: tags.muscle_groups,
+          equipment: tags.equipment,
+        });
+      })
+      .catch((error) => {
+        console.error('[EditorPage] Failed to load tags:', error);
+      });
+  }, [loadExistingTags]);
+
+  // Handle add cut point at current time
+  const handleAddCutPoint = () => {
+    if (currentTime > 0 && currentTime < videoDuration) {
+      addCutPoint(currentTime);
+    } else if (videoDuration > 0) {
+      // If currentTime is 0, add at 1 second for visibility
+      addCutPoint(Math.min(1, videoDuration / 2));
+    }
+  };
+
+  // If no video URL, show error
+  if (!videoUrl) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4" dir="rtl">
+        <div className="text-center">
+          <p className="text-red-400 text-lg mb-4">
+            לא נבחר וידאו לעריכה
+          </p>
+          <p className="text-gray-500 mb-6">
+            אנא העלה וידאו תחילה מעמוד ההעלאה
+          </p>
+          <Button
+            onClick={() => window.location.href = '/'}
+            variant="primary"
+          >
+            חזרה להעלאה
+          </Button>
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4 p-4" dir="rtl">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold text-gray-100">עורך טיימליין</h1>
+        <div className="flex gap-2">
+          <Button onClick={handleAddCutPoint} variant="secondary" size="sm">
+            <Scissors className="w-4 h-4 ml-1" />
+            הוסף חיתוך
+          </Button>
+        </div>
+      </div>
+
+      {/* Video placeholder - Plan 02 will implement video player */}
+      <div className="bg-black rounded-xl aspect-video flex items-center justify-center">
+        {videoDuration > 0 ? (
+          <video
+            src={videoUrl}
+            className="w-full h-full rounded-xl"
+            controls
+            playsInline
+          />
+        ) : (
+          <span className="text-gray-500">Loading video...</span>
+        )}
+      </div>
+
+      {/* Timeline Canvas */}
+      <TimelineCanvas />
+
+      {/* Segment cards */}
+      <div className="space-y-2">
+        <h2 className="text-lg font-semibold text-gray-200 mb-2">
+          סגמנטים ({segments.length})
+        </h2>
+        {segments.length === 0 ? (
+          <div className="bg-gray-800 rounded-lg p-4 text-center text-gray-500">
+            אין סגמנטים עדיין. הוסף נקודות חיתוך כדי ליצור סגמנטים.
+          </div>
+        ) : (
+          segments.map((seg, i) => (
+            <div
+              key={i}
+              className={`
+                bg-gray-800 rounded-lg p-3 text-right
+                border-2 transition-colors cursor-pointer
+                ${seg.details ? 'border-green-600' : 'border-transparent'}
+                hover:border-gray-600
+              `}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {seg.details && (
+                    <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </div>
+                <div className="text-right">
+                  <span className="font-medium text-gray-100">
+                    סגמנט #{i + 1}
+                  </span>
+                  <span className="text-gray-400 text-sm mr-2">
+                    {formatTime(seg.start)} - {formatTime(seg.end)}
+                  </span>
+                  <span className="text-gray-500 text-sm mr-2">
+                    ({formatTime(seg.end - seg.start)})
+                  </span>
+                </div>
+              </div>
+              {seg.details && (
+                <div className="mt-2 text-sm text-gray-400">
+                  <span className="text-green-400 font-medium">{seg.details.name}</span>
+                  {seg.details.muscleGroups.length > 0 && (
+                    <span className="mr-2">
+                      | {seg.details.muscleGroups.join(', ')}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Debug info - remove in production */}
+      {import.meta.env.DEV && (
+        <div className="bg-gray-900 rounded-lg p-3 text-xs text-gray-500 font-mono">
+          <p>Video: {videoUrl}</p>
+          <p>Duration: {formatTime(videoDuration)}</p>
+          <p>Current Time: {formatTime(currentTime)}</p>
+          <p>Segments: {segments.length}</p>
+        </div>
+      )}
     </div>
   );
 }
