@@ -15,3 +15,11 @@ output/
 
 .DS_Store
 Thumbs.db
+
+# Planning docs (local only)
+.planning/
+
+# Build artifacts
+frontend/dev-dist/
+static/react/
+nul
