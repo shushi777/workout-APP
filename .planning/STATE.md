@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Smooth, responsive mobile experience for editing workout videos
-**Current focus:** Phase 3 - Timeline Editor (COMPLETE)
+**Current focus:** Phase 3 - Timeline Editor (COMPLETE with UAT gaps closed)
 
 ## Current Position
 
 Phase: 3 of 5 (Timeline Editor)
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-02-03 - Completed 03-04-PLAN.md (Save Flow)
+Plan: 5 of 5 in current phase (gap closure plan)
+Status: Phase complete with UAT verified
+Last activity: 2026-02-03 - Completed 03-05-PLAN.md (UAT Gap Closure)
 
 Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 5.7 min
-- Total execution time: 0.7 hours
+- Total plans completed: 8
+- Average duration: 5.5 min
+- Total execution time: 0.75 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [████████░░] 80%
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 11min | 5.5min |
 | 02-upload-feature | 1 | 4min | 4min |
-| 03-timeline-editor | 4 | 24min | 6min |
+| 03-timeline-editor | 5 | 28min | 5.6min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (4min), 03-01 (8min), 03-02 (5min), 03-03 (7min), 03-04 (4min)
+- Last 5 plans: 03-01 (8min), 03-02 (5min), 03-03 (7min), 03-04 (4min), 03-05 (4min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -65,6 +65,9 @@ Recent decisions affecting current work:
 | 2026-02-03 | 03-03 | vaul-based drawer | Swipe-to-dismiss, accessibility built-in |
 | 2026-02-03 | 03-04 | Modal state machine: 4 states | Clear user feedback, prevents double-submit |
 | 2026-02-03 | 03-04 | Auto-navigate delay: 2 seconds | Allows user to see success message |
+| 2026-02-03 | 03-05 | opacity-0 for invisible touch targets | Canvas draws visual, React handles interaction |
+| 2026-02-03 | 03-05 | autoPlay hook parameter with default true | Backward compatible, main player uses false |
+| 2026-02-03 | 03-05 | Custom seekbar over native controls | Segment-relative time display needed |
 
 ### Pending Todos
 
@@ -76,27 +79,27 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-03T13:44:00Z
-Stopped at: Completed 03-04-PLAN.md (Save Flow)
+Last session: 2026-02-03T16:45:00Z
+Stopped at: Completed 03-05-PLAN.md (UAT Gap Closure)
 Resume file: None
 
-Previous plan summary (03-04):
-# Phase 03 Plan 04: Save Flow Summary
+Previous plan summary (03-05):
+# Phase 03 Plan 05: UAT Gap Closure Summary
 
-**Save button with progress modal and navigation to Library after successful save**
+**Fix 4 UAT gaps: duplicate cut points, play/pause behavior, auto-play on segment select, drawer seekbar**
 
 ## Accomplishments
-- Added saveTimeline API function with TypeScript interfaces
-- Created SaveFlow component with 4-state modal (idle, confirming, saving, success/error)
-- Integrated SaveFlow into EditorPage header with segment count indicator
-- Auto-navigation to /library after 2 second success delay
+- Made DraggableCutPoint invisible (opacity-0) to prevent duplicate circles
+- Added autoPlay parameter to useVideoSegmentPlayback hook
+- VideoPlayer uses autoPlay: false to prevent auto-play on segment select
+- Replaced drawer native controls with custom segment-relative seekbar
 
 ## Task Commits
-1. **Task 1: Add saveTimeline API function** - `d02c793` (feat)
-2. **Task 2: Create SaveFlow component** - `45e39ca` (feat)
-3. **Task 3: Wire SaveFlow to EditorPage** - `2b65d66` (feat)
+1. **Task 1: Make DraggableCutPoint invisible** - `11e3fe9` (fix)
+2. **Task 2: Fix play/pause + remove auto-play** - `eef6ce5` (fix)
+3. **Task 3: Custom segment-relative seekbar** - `9eedb89` (fix)
 
 ## Patterns Established
-- "Modal state machine: idle -> confirming -> saving -> success/error"
-- "Auto-navigate after success: setTimeout with delay for UX"
-- "Filter segments with details before API call"
+- "Invisible touch target: opacity-0 with full interactive capability"
+- "Hook autoPlay parameter: default true, pass false for user-controlled players"
+- "Custom video controls: segment-relative time when native controls insufficient"
