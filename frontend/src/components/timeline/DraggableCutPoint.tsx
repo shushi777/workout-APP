@@ -40,15 +40,17 @@ export function DraggableCutPoint({ id, x, type, isSelected }: DraggableCutPoint
       {...listeners}
       {...attributes}
     >
-      {/* Visual indicator - smaller circle matching canvas cut point */}
+      {/* Visual indicator - invisible (Canvas draws the visible circle) */}
+      {/* Keep DOM structure for potential future use, but hide with opacity-0 */}
       <div
         className={cn(
           "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
           "w-4 h-4 rounded-full",
           "border-2 border-white shadow-md",
           "transition-transform",
+          "opacity-0", // Hidden - Canvas draws the only visible circle
           isDragging && "scale-125",
-          // Color based on type and selection
+          // Color based on type and selection (kept for potential future use)
           type === 'auto' && !isSelected && "bg-[#667eea]",
           type === 'manual' && !isSelected && "bg-[#48bb78]",
           isSelected && "bg-[#ef4444]"
