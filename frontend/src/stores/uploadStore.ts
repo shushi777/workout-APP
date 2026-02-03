@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ProcessResponse } from '@/lib/api';
+import type { ProcessResponse } from '@/lib/api';
 
 export type UploadStatus = 'idle' | 'uploading' | 'processing' | 'complete' | 'error';
 
