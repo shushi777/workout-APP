@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Smooth, responsive mobile experience for editing workout videos
-**Current focus:** Phase 3 - Timeline Editor (IN PROGRESS)
+**Current focus:** Phase 3 - Timeline Editor (COMPLETE)
 
 ## Current Position
 
 Phase: 3 of 5 (Timeline Editor)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-03 - Completed 03-03-PLAN.md (Segment Tagging Drawer)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-03 - Completed 03-04-PLAN.md (Save Flow)
 
-Progress: [███████░░░] 70%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 6.3 min
-- Total execution time: 0.6 hours
+- Total plans completed: 7
+- Average duration: 5.7 min
+- Total execution time: 0.7 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [███████░░░] 70%
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 11min | 5.5min |
 | 02-upload-feature | 1 | 4min | 4min |
-| 03-timeline-editor | 3 | 20min | 6.7min |
+| 03-timeline-editor | 4 | 24min | 6min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (4min), 03-01 (8min), 03-02 (5min), 03-03 (7min)
+- Last 5 plans: 02-01 (4min), 03-01 (8min), 03-02 (5min), 03-03 (7min), 03-04 (4min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -63,6 +63,8 @@ Recent decisions affecting current work:
 | 2026-02-03 | 03-03 | Custom autocomplete over MUI | Avoid heavy dependency and theme conflicts |
 | 2026-02-03 | 03-03 | Media Fragments URI for video preview | Native browser support, no custom controls needed |
 | 2026-02-03 | 03-03 | vaul-based drawer | Swipe-to-dismiss, accessibility built-in |
+| 2026-02-03 | 03-04 | Modal state machine: 4 states | Clear user feedback, prevents double-submit |
+| 2026-02-03 | 03-04 | Auto-navigate delay: 2 seconds | Allows user to see success message |
 
 ### Pending Todos
 
@@ -74,27 +76,27 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-03T13:38:00Z
-Stopped at: Completed 03-03-PLAN.md (Segment Tagging Drawer)
+Last session: 2026-02-03T13:44:00Z
+Stopped at: Completed 03-04-PLAN.md (Save Flow)
 Resume file: None
 
-Previous plan summary (03-03):
-# Phase 03 Plan 03: Segment Tagging Drawer Summary
+Previous plan summary (03-04):
+# Phase 03 Plan 04: Save Flow Summary
 
-**Bottom sheet drawer with exercise form, autocomplete chips, video preview using Media Fragments, and vaul-based swipe gestures**
+**Save button with progress modal and navigation to Library after successful save**
 
 ## Accomplishments
-- Installed shadcn/ui with vaul-based Drawer component for mobile bottom sheet
-- Built custom AutocompleteChips component with keyboard navigation
-- Created SegmentDrawer with video preview, exercise form, and audio toggle
-- Integrated drawer into EditorPage with segment selection
+- Added saveTimeline API function with TypeScript interfaces
+- Created SaveFlow component with 4-state modal (idle, confirming, saving, success/error)
+- Integrated SaveFlow into EditorPage header with segment count indicator
+- Auto-navigation to /library after 2 second success delay
 
 ## Task Commits
-1. **Task 1: Install shadcn/ui Drawer component** - `33d295a` (feat)
-2. **Task 2: Create AutocompleteChips component** - `96aefd3` (feat)
-3. **Task 3: Create SegmentDrawer component** - `e686480` (feat)
+1. **Task 1: Add saveTimeline API function** - `d02c793` (feat)
+2. **Task 2: Create SaveFlow component** - `45e39ca` (feat)
+3. **Task 3: Wire SaveFlow to EditorPage** - `2b65d66` (feat)
 
 ## Patterns Established
-- "Drawer form pattern: Local state + sync to store on save"
-- "Video preview with key prop: Force reload on segment change"
-- "Autocomplete chips: Custom lightweight alternative to MUI"
+- "Modal state machine: idle -> confirming -> saving -> success/error"
+- "Auto-navigate after success: setTimeout with delay for UX"
+- "Filter segments with details before API call"
