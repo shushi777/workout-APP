@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Smooth, responsive mobile experience for editing workout videos
-**Current focus:** Phase 5 - PWA Migration (In Progress)
+**Current focus:** Phase 5 - PWA Migration (COMPLETE)
 
 ## Current Position
 
 Phase: 5 of 5 (PWA Migration)
-Plan: 1 of 2 in current phase (complete)
-Status: In progress
-Last activity: 2026-02-03 - Completed 05-01-PLAN.md (PWA Core Configuration)
+Plan: 2 of 2 in current phase (complete)
+Status: PROJECT COMPLETE
+Last activity: 2026-02-03 - Completed 05-02-PLAN.md (Web Share Target)
 
-Progress: [███████████░] 92%
+Progress: [████████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 5.4 min
-- Total execution time: 0.99 hours
+- Total plans completed: 12
+- Average duration: 5.6 min
+- Total execution time: 1.12 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [███████████░] 92%
 | 02-upload-feature | 1 | 4min | 4min |
 | 03-timeline-editor | 5 | 28min | 5.6min |
 | 04-exercise-library | 2 | 10min | 5min |
-| 05-pwa-migration | 1 | 6min | 6min |
+| 05-pwa-migration | 2 | 14min | 7min |
 
 **Recent Trend:**
-- Last 5 plans: 03-04 (4min), 03-05 (4min), 04-01 (6min), 04-02 (4min), 05-01 (6min)
+- Last 5 plans: 03-05 (4min), 04-01 (6min), 04-02 (4min), 05-01 (6min), 05-02 (8min)
 - Trend: Stable, efficient execution
 
 *Updated after each plan completion*
@@ -79,6 +79,10 @@ Recent decisions affecting current work:
 | 2026-02-03 | 05-01 | injectManifest strategy for custom SW | Required for Share Target in 05-02 |
 | 2026-02-03 | 05-01 | Workbox caching: NetworkFirst for API/videos, CacheFirst for images | Balances freshness with performance |
 | 2026-02-03 | 05-01 | Hourly SW update check | Reasonable balance between freshness and battery/network |
+| 2026-02-03 | 05-02 | idb library for IndexedDB | Type-safe wrapper with promise-based API |
+| 2026-02-03 | 05-02 | Dynamic import in SW for shareTarget | Keeps service worker bundle small |
+| 2026-02-03 | 05-02 | IndexedDB for SW-to-app data transfer | Files too large for URL params or postMessage |
+| 2026-02-03 | 05-02 | AppContent component extraction | Hooks need Router context, can't be in root with BrowserRouter |
 
 ### Pending Todos
 
@@ -86,32 +90,33 @@ None.
 
 ### Blockers/Concerns
 
-- Phase 5 (PWA): Share Target + React SPA requires careful service worker configuration. Research flagged this as needing a spike/prototype. Plan 05-01 established foundation.
+None - all phases complete.
 
 ## Session Continuity
 
-Last session: 2026-02-03T21:17:00Z
-Stopped at: Completed 05-01-PLAN.md (PWA Core Configuration)
+Last session: 2026-02-03T21:28:00Z
+Stopped at: Completed 05-02-PLAN.md (Web Share Target) - PROJECT COMPLETE
 Resume file: None
 
-Previous plan summary (05-01):
-# Phase 05 Plan 01: PWA Core Configuration Summary
+Previous plan summary (05-02):
+# Phase 05 Plan 02: Web Share Target Summary
 
-**VitePWA with injectManifest strategy, Workbox caching, and update notification UI**
+**Web Share Target API with service worker POST interception and IndexedDB transfer to React upload flow**
 
 ## Accomplishments
-- VitePWA plugin configured with injectManifest for custom service worker support
-- Custom service worker with Workbox caching strategies for API, videos, images, and fonts
-- PWA manifest with app identity (name, description, colors, icons)
-- UpdatePrompt component shows offline ready and update available notifications
+- Web Share Target configured in PWA manifest (accepts video/* via POST)
+- Service worker intercepts /share-receiver POST, stores video in IndexedDB
+- IndexedDB helpers with idb library for type-safe async storage
+- App.tsx detects shared video query param, retrieves from IndexedDB, sets in upload store
+- UploadPage processes shared files identically to dropped files (consistent UX)
 
 ## Task Commits
-1. **Task 1: Install vite-plugin-pwa and Workbox dependencies** - `100d4b9` (chore)
-2. **Task 2: Configure VitePWA plugin with injectManifest strategy** - `2d1f5ed` (feat)
-3. **Task 3: Create custom service worker with Workbox precaching** - `37a142a` (feat)
-4. **Task 4: Create UpdatePrompt component and add to App** - `92fad37` (feat)
+1. **Task 1: Install idb library and create shareTarget helpers** - `2231282` (feat)
+2. **Task 2: Add share_target to manifest and update service worker** - `35d66f4` (feat)
+3. **Task 3: Update upload store and UploadPage for shared files** - `c6b2c13` (feat)
+4. **Task 4: Update App.tsx to detect and handle shared videos** - `e82072e` (feat)
 
 ## Patterns Established
-- "useRegisterSW hook: Handles SW registration, offline ready state, and update prompts"
-- "Custom SW with precacheAndRoute: App shell cached automatically by Vite PWA"
-- "UpdatePrompt component: Bottom-positioned notification for offline/update states"
+- "SW POST handler pattern: Intercept before precacheAndRoute, store in IndexedDB, redirect with ID"
+- "Shared file cleanup pattern: Delete from IndexedDB immediately after retrieval"
+- "1-hour cleanup for abandoned shared files"
