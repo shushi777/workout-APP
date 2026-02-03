@@ -7,13 +7,19 @@ interface Segment {
 
 /**
  * Hook for controlling segment playback with automatic looping.
- * Seeks to segment start, plays, and stops at segment end.
+ * Seeks to segment start, optionally plays, and stops at segment end.
  * Includes proper event listener cleanup to prevent memory leaks.
+ *
+ * @param videoRef - Reference to the video element
+ * @param segment - Segment with start/end times
+ * @param isActive - Whether segment playback is active
+ * @param autoPlay - Whether to auto-play when segment is selected (default: true)
  */
 export function useVideoSegmentPlayback(
   videoRef: React.RefObject<HTMLVideoElement | null>,
   segment: Segment | null,
-  isActive: boolean
+  isActive: boolean,
+  autoPlay: boolean = true
 ) {
   const listenerRef = useRef<(() => void) | null>(null);
 
@@ -24,10 +30,12 @@ export function useVideoSegmentPlayback(
     // Seek to segment start
     video.currentTime = segment.start;
 
-    // Auto-play segment
-    video.play().catch((err) => {
-      console.log('[useVideoSegmentPlayback] Auto-play prevented:', err);
-    });
+    // Auto-play segment only if autoPlay is true
+    if (autoPlay) {
+      video.play().catch((err) => {
+        console.log('[useVideoSegmentPlayback] Auto-play prevented:', err);
+      });
+    }
 
     // Create listener to stop at segment end
     const listener = () => {
@@ -50,5 +58,5 @@ export function useVideoSegmentPlayback(
         listenerRef.current = null;
       }
     };
-  }, [videoRef, segment?.start, segment?.end, isActive]);
+  }, [videoRef, segment?.start, segment?.end, isActive, autoPlay]);
 }

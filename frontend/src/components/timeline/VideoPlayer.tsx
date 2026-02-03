@@ -34,7 +34,9 @@ export function VideoPlayer() {
     : null;
 
   // Use segment playback hook when segment is selected
-  useVideoSegmentPlayback(videoRef, selectedSegment, selectedSegmentIndex !== null);
+  // Pass autoPlay: false to prevent auto-play when clicking segment cards
+  // User can still manually play/pause via click on video
+  useVideoSegmentPlayback(videoRef, selectedSegment, selectedSegmentIndex !== null, false);
 
   // Sync currentTime with store (when not in segment preview mode)
   useEffect(() => {
