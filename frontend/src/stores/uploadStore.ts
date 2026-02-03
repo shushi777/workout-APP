@@ -9,6 +9,7 @@ interface UploadState {
   progress: number;
   error: string | null;
   result: ProcessResponse | null;
+  sharedFile: File | null;
 
   // Actions
   setFile: (file: File) => void;
@@ -18,6 +19,7 @@ interface UploadState {
   setComplete: (result: ProcessResponse) => void;
   setError: (error: string) => void;
   reset: () => void;
+  setSharedFile: (file: File | null) => void;
 }
 
 export const useUploadStore = create<UploadState>()((set) => ({
@@ -26,6 +28,7 @@ export const useUploadStore = create<UploadState>()((set) => ({
   progress: 0,
   error: null,
   result: null,
+  sharedFile: null,
 
   setFile: (file) => set({ file, error: null }),
   startUpload: () => set({ status: 'uploading', progress: 0, error: null }),
@@ -38,6 +41,8 @@ export const useUploadStore = create<UploadState>()((set) => ({
     status: 'idle',
     progress: 0,
     error: null,
-    result: null
+    result: null,
+    sharedFile: null,
   }),
+  setSharedFile: (file) => set({ sharedFile: file }),
 }));

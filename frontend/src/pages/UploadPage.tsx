@@ -13,11 +13,13 @@ export function UploadPage() {
 
   const {
     file,
+    sharedFile,
     status,
     progress,
     error,
     result,
     setFile,
+    setSharedFile,
     startUpload,
     updateProgress,
     setProcessing,
@@ -40,6 +42,16 @@ export function UploadPage() {
       abortRef.current?.();
     };
   }, []);
+
+  // Process shared file from Web Share Target
+  useEffect(() => {
+    if (sharedFile && status === 'idle') {
+      // Set the shared file as the current file (same as DropZone callback)
+      setFile(sharedFile);
+      // Clear sharedFile to prevent re-processing on re-renders
+      setSharedFile(null);
+    }
+  }, [sharedFile, status, setFile, setSharedFile]);
 
   const handleFileSelect = (file: File) => {
     setFile(file);
