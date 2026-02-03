@@ -63,13 +63,13 @@ Plans:
   7. User can enter exercise name, select muscle groups/equipment with autocomplete, toggle audio removal
   8. Segment card shows checkmark badge after saving details
   9. User can save all tagged segments and is navigated to Library after video cutting completes
-**Plans**: TBD
+**Plans:** 4 plans
 
 Plans:
-- [ ] 03-01: Canvas timeline with cut point rendering and dragging
-- [ ] 03-02: Video player with custom controls and segment preview
-- [ ] 03-03: Segment tagging drawer with form and autocomplete
-- [ ] 03-04: Save flow with progress and navigation
+- [ ] 03-01-PLAN.md — Canvas timeline with Zustand store, dnd-kit dragging, and cut point rendering
+- [ ] 03-02-PLAN.md — Video player with custom controls and segment preview playback
+- [ ] 03-03-PLAN.md — Segment tagging drawer with shadcn/ui, autocomplete chips, and form
+- [ ] 03-04-PLAN.md — Save flow with progress modal and navigation to Library
 
 ### Phase 4: Exercise Library
 **Goal**: User can view, search, filter, play, edit, and delete saved exercises
