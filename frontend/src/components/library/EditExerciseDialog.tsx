@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { AutocompleteChips } from '@/components/tagging/AutocompleteChips';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import type { Exercise } from '@/lib/api';
 
 interface EditExerciseDialogProps {

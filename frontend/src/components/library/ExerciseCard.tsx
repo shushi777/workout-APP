@@ -11,7 +11,7 @@ interface ExerciseCardProps {
 
 export function ExerciseCard({ exercise, onEdit, onDelete }: ExerciseCardProps) {
   const [showVideo, setShowVideo] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [_isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Format duration as MM:SS
