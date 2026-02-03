@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A mobile-only Progressive Web App for editing workout videos. Users upload videos, use AI scene detection to suggest cuts, adjust cut points on an interactive timeline, tag segments with exercise details, and build an exercise library. This project rebuilds the existing vanilla HTML/JS frontend in React + Tailwind CSS to improve mobile usability and performance.
+A mobile-only Progressive Web App for editing workout videos. Users upload videos, use AI scene detection to suggest cuts, adjust cut points on an interactive timeline, tag segments with exercise details, and build an exercise library. The frontend is built with React 19 + Tailwind CSS 4 + Zustand, delivering a smooth mobile experience with PWA installability and Web Share Target support.
 
 ## Core Value
 
@@ -12,55 +12,55 @@ Smooth, responsive mobile experience for editing workout videos and building an 
 
 ### Validated
 
-<!-- Existing features that work and must be preserved -->
+<!-- Shipped in v1.0 -->
 
-- [x] Video upload via drag-and-drop — existing
-- [x] Video upload via PWA share target (share from gallery) — existing
-- [x] AI scene detection with PySceneDetect — existing
-- [x] Interactive Canvas timeline with cut points — existing
-- [x] Drag-and-drop cut point adjustment — existing
-- [x] Manual cut point addition at playhead — existing
-- [x] Segment preview in main player — existing
-- [x] Exercise tagging (name, muscle groups, equipment, audio flag) — existing
-- [x] Autocomplete for muscle groups and equipment — existing
-- [x] FFmpeg video cutting into segments — existing
-- [x] Thumbnail generation for exercises — existing
-- [x] Exercise library with search and filter — existing
-- [x] Exercise editing and deletion — existing
-- [x] Cloudflare R2 cloud storage — existing
-- [x] PWA installability — existing
+- [x] Video upload via drag-and-drop — v1.0
+- [x] Video upload via PWA share target (share from gallery) — v1.0
+- [x] AI scene detection with PySceneDetect — existing (preserved)
+- [x] Interactive Canvas timeline with cut points — v1.0
+- [x] Drag-and-drop cut point adjustment — v1.0
+- [x] Manual cut point addition at playhead — v1.0
+- [x] Segment preview in main player — v1.0
+- [x] Exercise tagging (name, muscle groups, equipment, audio flag) — v1.0
+- [x] Autocomplete for muscle groups and equipment — v1.0
+- [x] FFmpeg video cutting into segments — existing (preserved)
+- [x] Thumbnail generation for exercises — existing (preserved)
+- [x] Exercise library with search and filter — v1.0
+- [x] Exercise editing and deletion — v1.0
+- [x] Cloudflare R2 cloud storage — existing (preserved)
+- [x] PWA installability — v1.0
+- [x] Web Share Target API — v1.0
+- [x] React + Tailwind CSS frontend architecture — v1.0
+- [x] Dark theme with lighter UI elements — v1.0
+- [x] Tab-based SPA (Upload | Editor | Library) — v1.0
+- [x] Instant tab switching without page reloads — v1.0
+- [x] Mobile-optimized touch interactions (44px targets) — v1.0
+- [x] Canvas timeline integration in React — v1.0
 
 ### Active
 
-<!-- Frontend rebuild scope -->
+<!-- For next milestone -->
 
-- [ ] React + Tailwind CSS frontend architecture
-- [ ] Dark theme with lighter UI elements
-- [ ] Tab-based SPA (Upload | Editor | Library)
-- [ ] Instant tab switching without page reloads
-- [ ] Smooth video playback on mobile
-- [ ] Mobile-optimized touch interactions
-- [ ] Canvas timeline integration in React
-- [ ] PWA features preserved (manifest, service worker, share target)
+(None defined - use /gsd:new-milestone to start next version)
 
 ### Out of Scope
 
 - Desktop-specific layouts — mobile-only app
 - Backend changes — keep Flask API as-is
-- New features beyond current functionality — feature parity only
-- Animations and micro-interactions beyond basics — feature parity first
+- Offline video editing — requires significant architecture changes
 
 ## Context
 
 **Current State:**
-- Frontend: 3 separate HTML pages with vanilla JavaScript
-- Pain points: Hard to use on mobile, video playback and page transitions feel janky
-- Timeline editor uses HTML5 Canvas — works well, needs React wrapper
+- Frontend: React 19 + Tailwind CSS 4 + Zustand (4,400 LOC TypeScript)
+- Tech stack: Vite, React Router, dnd-kit, vaul, idb, Workbox
+- PWA: Installable with Web Share Target support
+- Shipped: v1.0 (2026-02-03)
 
 **Technical Environment:**
 - Backend: Flask 3.0, PostgreSQL, Cloudflare R2 storage
 - Video processing: FFmpeg, PySceneDetect
-- Existing API endpoints work and should not change
+- All API endpoints unchanged from original implementation
 
 **Codebase Map:** `.planning/codebase/` contains architecture and stack analysis
 
@@ -68,17 +68,23 @@ Smooth, responsive mobile experience for editing workout videos and building an 
 
 - **Backend**: Keep Flask API unchanged — frontend-only rebuild
 - **PWA**: Must maintain share target and installability
-- **Canvas**: Timeline editor uses Canvas — wrap in React component, don't rewrite
+- **Canvas**: Timeline editor uses Canvas — wrapped in React component
 - **Mobile-only**: No desktop layouts needed
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| React + Tailwind | Modern stack, component architecture, utility-first CSS | — Pending |
-| Tab-based SPA | Instant switching, better mobile UX than page navigation | — Pending |
-| Dark theme | User preference, easier on eyes | — Pending |
-| Wrap existing Canvas | Timeline works, avoid rewrite risk | — Pending |
+| React 19 + Tailwind CSS 4 | Modern stack, component architecture, utility-first CSS | Good |
+| Tab-based SPA | Instant switching, better mobile UX than page navigation | Good |
+| Dark theme | User preference, easier on eyes | Good |
+| Wrap existing Canvas | Timeline works, avoid rewrite risk | Good |
+| Zustand for state | Lightweight alternative to Redux | Good |
+| dnd-kit for drag | Modern, accessible, sensor-based architecture | Good |
+| vaul for drawer | Swipe-to-dismiss, accessibility built-in | Good |
+| XHR for uploads | fetch doesn't support upload progress | Good |
+| injectManifest for SW | Required for Share Target POST handling | Good |
+| idb for IndexedDB | Type-safe wrapper with promise-based API | Good |
 
 ---
-*Last updated: 2026-02-02 after initialization*
+*Last updated: 2026-02-03 after v1.0 milestone*
