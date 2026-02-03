@@ -22,46 +22,37 @@ result: pass
 
 ### 3. Tab navigation works without page reload
 expected: Tap Upload, Editor, Library tabs at bottom. Pages switch instantly without full page reload. URL changes in browser.
-result: issue
-reported: "there is a white screen - Uncaught SyntaxError: ProcessResponse export missing from api.ts"
-severity: blocker
+result: pass
 
 ### 4. Active tab is highlighted
 expected: The currently selected tab shows blue color. Other tabs are gray/dim.
-result: skipped
-reason: blocked by white screen issue
+result: pass
 
 ### 5. Touch targets are large enough
 expected: Buttons and tab icons are easy to tap on mobile. No need for precise tapping (44px+ size).
-result: skipped
-reason: blocked by app crash
+result: pass
 
 ### 6. Flask proxy works for API calls
 expected: API calls to /api, /process, /get-tags routes work from the React app (no CORS errors in dev).
-result: skipped
-reason: blocked by app crash
+result: pass
 
 ## Summary
 
 total: 6
-passed: 2
-issues: 1
+passed: 6
+issues: 0
 pending: 0
-skipped: 3
+skipped: 0
 
 ## Gaps
 
 - truth: "Tab navigation works without page reload - pages switch instantly, URL changes"
-  status: failed
+  status: fixed
   reason: "User reported: there is a white screen"
   severity: blocker
   test: 3
-  root_cause: "uploadStore.ts imports ProcessResponse from api.ts but that export doesn't exist"
-  artifacts:
-    - path: "frontend/src/stores/uploadStore.ts"
-      issue: "imports non-existent ProcessResponse export"
-    - path: "frontend/src/lib/api.ts"
-      issue: "missing ProcessResponse type export"
-  missing:
-    - "Add ProcessResponse type export to api.ts OR fix the import in uploadStore.ts"
-  debug_session: ""
+  root_cause: "verbatimModuleSyntax requires 'import type' for type-only imports"
+  fix_commits:
+    - d73d6b5: "add path alias config to tsconfig.app.json"
+    - afaa392: "use import type for ProcessResponse"
+  verified: true
