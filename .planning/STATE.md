@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 4 of 5 (Exercise Library)
-Plan: 1 of 3 in current phase
-Status: In progress
-Last activity: 2026-02-03 - Completed 04-01-PLAN.md (Exercise Library Grid)
+Plan: 2 of 2 in current phase (complete)
+Status: Phase complete
+Last activity: 2026-02-03 - Completed 04-02-PLAN.md (Video Playback & Exercise CRUD)
 
-Progress: [█████████░] 90%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 5.4 min
-- Total execution time: 0.82 hours
+- Total plans completed: 10
+- Average duration: 5.3 min
+- Total execution time: 0.88 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [█████████░] 90%
 | 01-foundation | 2 | 11min | 5.5min |
 | 02-upload-feature | 1 | 4min | 4min |
 | 03-timeline-editor | 5 | 28min | 5.6min |
-| 04-exercise-library | 1 | 6min | 6min |
+| 04-exercise-library | 2 | 10min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (5min), 03-03 (7min), 03-04 (4min), 03-05 (4min), 04-01 (6min)
-- Trend: Stable
+- Last 5 plans: 03-03 (7min), 03-04 (4min), 03-05 (4min), 04-01 (6min), 04-02 (4min)
+- Trend: Stable, efficient execution
 
 *Updated after each plan completion*
 
@@ -72,6 +72,9 @@ Recent decisions affecting current work:
 | 2026-02-03 | 04-01 | Auto-fetch on filter/search changes | Better UX than manual submit button |
 | 2026-02-03 | 04-01 | Responsive grid: 1-2-3-4 columns by breakpoint | Balances readability with screen utilization |
 | 2026-02-03 | 04-01 | Filter chips with toggle pattern | Blue when selected, 44px touch targets |
+| 2026-02-03 | 04-02 | Intersection Observer threshold: 0.5 | Triggers autoplay when video is meaningfully visible |
+| 2026-02-03 | 04-02 | Video attributes: muted, playsInline, loop | Required for browser autoplay policies and iOS support |
+| 2026-02-03 | 04-02 | Delete dialog shows exercise info | User confirms correct exercise before permanent deletion |
 
 ### Pending Todos
 
@@ -83,27 +86,27 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-03T19:46:18Z
-Stopped at: Completed 04-01-PLAN.md (Exercise Library Grid)
+Last session: 2026-02-03T17:54:25Z
+Stopped at: Completed 04-02-PLAN.md (Video Playback & Exercise CRUD) - Phase 4 COMPLETE
 Resume file: None
 
-Previous plan summary (04-01):
-# Phase 04 Plan 01: Exercise Library Grid Summary
+Previous plan summary (04-02):
+# Phase 04 Plan 02: Video Playback & Exercise CRUD Summary
 
-**Responsive exercise grid with real-time search/filter using Zustand auto-fetch pattern**
+**Exercise library with video autoplay on scroll, edit dialog, and delete confirmation**
 
 ## Accomplishments
-- Exercise library loads from backend API with pagination support
-- Search input filters exercises by name in real-time
-- Muscle group and equipment chips filter with toggle pattern
-- Responsive grid layout (1-4 columns based on screen size)
+- Exercise cards support click-to-play video with scroll-triggered autoplay
+- Videos autoplay when 50% visible, pause when scrolled out of view
+- Edit dialog allows modifying exercise name, muscle groups, and equipment
+- Delete dialog shows warning and exercise info before permanent deletion
 
 ## Task Commits
-1. **Task 1: Add exercise API functions and types** - `b201fc8` (feat)
-2. **Task 2: Create exercise store with search/filter state** - `4efa4b2` (feat)
-3. **Task 3: Create library components and wire up LibraryPage** - `7d93988` (feat)
+1. **Task 1: Add shadcn Dialog component** - `96700c9` (feat)
+2. **Task 2: Update ExerciseCard with video autoplay on scroll** - `eb515b9` (feat)
+3. **Task 3: Create EditExerciseDialog and DeleteConfirmDialog** - `08b543e` (feat)
 
 ## Patterns Established
-- "Zustand store with auto-fetch: actions call fetchExercises() after state change"
-- "Search with clear button: X icon appears when query is non-empty"
-- "Exercise card hover state: play overlay with centered button"
+- "Intersection Observer for scroll-triggered autoplay with 0.5 threshold"
+- "Dialog state management: separate open/close handlers for edit and delete"
+- "Video autoplay attributes: muted, playsInline, loop for browser compatibility"
