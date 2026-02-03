@@ -26,30 +26,30 @@ Requirements for the React + Tailwind frontend rebuild. Each maps to roadmap pha
 
 ### Timeline Editor
 
-- [ ] **EDITOR-01**: Canvas timeline renders with cut points from scene detection
-- [ ] **EDITOR-02**: User can drag cut points to adjust timing
-- [ ] **EDITOR-03**: User can add manual cut points at playhead position
-- [ ] **EDITOR-04**: User can pinch-to-zoom on timeline for precision
-- [ ] **EDITOR-05**: Video player plays with custom controls (no native controls)
-- [ ] **EDITOR-06**: User can tap timeline segment to preview in player
-- [ ] **EDITOR-07**: Player stops at segment end during preview
+- [x] **EDITOR-01**: Canvas timeline renders with cut points from scene detection
+- [x] **EDITOR-02**: User can drag cut points to adjust timing
+- [x] **EDITOR-03**: User can add manual cut points at playhead position
+- [x] **EDITOR-04**: User can pinch-to-zoom on timeline for precision
+- [x] **EDITOR-05**: Video player plays with custom controls (no native controls)
+- [x] **EDITOR-06**: User can tap timeline segment to preview in player
+- [x] **EDITOR-07**: Player stops at segment end during preview
 
 ### Segment Tagging
 
-- [ ] **TAG-01**: User can tap segment to open tagging drawer
-- [ ] **TAG-02**: Drawer shows video preview of selected segment
-- [ ] **TAG-03**: User can enter exercise name
-- [ ] **TAG-04**: User can select muscle groups with autocomplete chips
-- [ ] **TAG-05**: User can select equipment with autocomplete chips
-- [ ] **TAG-06**: User can toggle "remove audio" option
-- [ ] **TAG-07**: User can save segment details
-- [ ] **TAG-08**: Segment card shows checkmark when details saved
+- [x] **TAG-01**: User can tap segment to open tagging drawer
+- [x] **TAG-02**: Drawer shows video preview of selected segment
+- [x] **TAG-03**: User can enter exercise name
+- [x] **TAG-04**: User can select muscle groups with autocomplete chips
+- [x] **TAG-05**: User can select equipment with autocomplete chips
+- [x] **TAG-06**: User can toggle "remove audio" option
+- [x] **TAG-07**: User can save segment details
+- [x] **TAG-08**: Segment card shows checkmark when details saved
 
 ### Save & Process
 
-- [ ] **SAVE-01**: User can save timeline with all tagged segments
-- [ ] **SAVE-02**: User sees progress indicator during video cutting
-- [ ] **SAVE-03**: User is navigated to Library tab after successful save
+- [x] **SAVE-01**: User can save timeline with all tagged segments
+- [x] **SAVE-02**: User sees progress indicator during video cutting
+- [x] **SAVE-03**: User is navigated to Library tab after successful save
 
 ### Exercise Library
 
@@ -125,24 +125,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UPLOAD-03 | Phase 2 | Complete |
 | UPLOAD-04 | Phase 2 | Complete |
 | UPLOAD-05 | Phase 2 | Complete |
-| EDITOR-01 | Phase 3 | Pending |
-| EDITOR-02 | Phase 3 | Pending |
-| EDITOR-03 | Phase 3 | Pending |
-| EDITOR-04 | Phase 3 | Pending |
-| EDITOR-05 | Phase 3 | Pending |
-| EDITOR-06 | Phase 3 | Pending |
-| EDITOR-07 | Phase 3 | Pending |
-| TAG-01 | Phase 3 | Pending |
-| TAG-02 | Phase 3 | Pending |
-| TAG-03 | Phase 3 | Pending |
-| TAG-04 | Phase 3 | Pending |
-| TAG-05 | Phase 3 | Pending |
-| TAG-06 | Phase 3 | Pending |
-| TAG-07 | Phase 3 | Pending |
-| TAG-08 | Phase 3 | Pending |
-| SAVE-01 | Phase 3 | Pending |
-| SAVE-02 | Phase 3 | Pending |
-| SAVE-03 | Phase 3 | Pending |
+| EDITOR-01 | Phase 3 | Complete |
+| EDITOR-02 | Phase 3 | Complete |
+| EDITOR-03 | Phase 3 | Complete |
+| EDITOR-04 | Phase 3 | Complete |
+| EDITOR-05 | Phase 3 | Complete |
+| EDITOR-06 | Phase 3 | Complete |
+| EDITOR-07 | Phase 3 | Complete |
+| TAG-01 | Phase 3 | Complete |
+| TAG-02 | Phase 3 | Complete |
+| TAG-03 | Phase 3 | Complete |
+| TAG-04 | Phase 3 | Complete |
+| TAG-05 | Phase 3 | Complete |
+| TAG-06 | Phase 3 | Complete |
+| TAG-07 | Phase 3 | Complete |
+| TAG-08 | Phase 3 | Complete |
+| SAVE-01 | Phase 3 | Complete |
+| SAVE-02 | Phase 3 | Complete |
+| SAVE-03 | Phase 3 | Complete |
 | LIB-01 | Phase 4 | Pending |
 | LIB-02 | Phase 4 | Pending |
 | LIB-03 | Phase 4 | Pending |

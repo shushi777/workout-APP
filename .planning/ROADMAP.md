@@ -12,7 +12,7 @@ Rebuild the workout video editor frontend from vanilla HTML/JS to React + Tailwi
 
 - [x] **Phase 1: Foundation & Design System** - React project setup with Tailwind dark theme and mobile UX patterns
 - [x] **Phase 2: Upload Feature** - Video upload with drag-and-drop and processing status
-- [ ] **Phase 3: Timeline Editor** - Canvas timeline, video player, segment tagging, and save flow
+- [x] **Phase 3: Timeline Editor** - Canvas timeline, video player, segment tagging, and save flow
 - [ ] **Phase 4: Exercise Library** - View, search, filter, play, edit, and delete exercises
 - [ ] **Phase 5: PWA Migration** - Installability, share target, and offline support
 
@@ -66,10 +66,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Canvas timeline with Zustand store, dnd-kit dragging, and cut point rendering
-- [ ] 03-02-PLAN.md — Video player with custom controls and segment preview playback
-- [ ] 03-03-PLAN.md — Segment tagging drawer with shadcn/ui, autocomplete chips, and form
-- [ ] 03-04-PLAN.md — Save flow with progress modal and navigation to Library
+- [x] 03-01-PLAN.md — Canvas timeline with Zustand store, dnd-kit dragging, and cut point rendering
+- [x] 03-02-PLAN.md — Video player with custom controls and segment preview playback
+- [x] 03-03-PLAN.md — Segment tagging drawer with shadcn/ui, autocomplete chips, and form
+- [x] 03-04-PLAN.md — Save flow with progress modal and navigation to Library
 
 ### Phase 4: Exercise Library
 **Goal**: User can view, search, filter, play, edit, and delete saved exercises
@@ -111,6 +111,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Foundation & Design System | 2/2 | ✓ Complete | 2026-02-03 |
 | 2. Upload Feature | 1/1 | ✓ Complete | 2026-02-03 |
-| 3. Timeline Editor | 0/4 | Not started | - |
+| 3. Timeline Editor | 4/4 | ✓ Complete | 2026-02-03 |
 | 4. Exercise Library | 0/2 | Not started | - |
 | 5. PWA Migration | 0/2 | Not started | - |
