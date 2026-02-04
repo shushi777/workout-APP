@@ -119,6 +119,13 @@ export function SegmentDrawer() {
     }
   };
 
+  const togglePlayPause = () => {
+    const video = drawerVideoRef.current;
+    if (video) {
+      isDrawerPlaying ? video.pause() : video.play();
+    }
+  };
+
   // Video preview URL with Media Fragments
   const previewUrl =
     segment && videoUrl ? `${videoUrl}#t=${segment.start},${segment.end}` : '';
@@ -181,19 +188,20 @@ export function SegmentDrawer() {
                 }}
               />
               {/* Custom Controls - Segment-relative seekbar */}
-              <div className="bg-black/80 p-2 flex items-center gap-2">
+              <div className="bg-black/80 p-3 flex items-center gap-3">
                 <button
-                  onClick={() => {
-                    const video = drawerVideoRef.current;
-                    if (video) {
-                      isDrawerPlaying ? video.pause() : video.play();
-                    }
-                  }}
-                  className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 rounded"
+                  onClick={togglePlayPause}
+                  className="w-11 h-11 flex items-center justify-center rounded-lg
+                             bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors"
+                  aria-label={isDrawerPlaying ? 'Pause' : 'Play'}
                 >
-                  {isDrawerPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  {isDrawerPlaying ? (
+                    <Pause className="w-6 h-6 text-white" />
+                  ) : (
+                    <Play className="w-6 h-6 text-white" />
+                  )}
                 </button>
-                <span className="text-white text-xs min-w-[80px]">
+                <span className="text-white text-sm font-medium min-w-[80px]">
                   {formatTime(Math.max(0, drawerTime - segment.start))} / {formatTime(segment.end - segment.start)}
                 </span>
                 <input
@@ -214,10 +222,20 @@ export function SegmentDrawer() {
                     }
                   }}
                   dir="ltr"
-                  className="flex-1 h-1.5 bg-white/30 rounded-full appearance-none cursor-pointer
-                             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3
-                             [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full
-                             [&::-webkit-slider-thumb]:bg-blue-500"
+                  className="flex-1 h-2 bg-white/30 rounded-full appearance-none cursor-pointer
+                             [&::-webkit-slider-thumb]:appearance-none
+                             [&::-webkit-slider-thumb]:w-5
+                             [&::-webkit-slider-thumb]:h-5
+                             [&::-webkit-slider-thumb]:rounded-full
+                             [&::-webkit-slider-thumb]:bg-blue-500
+                             [&::-webkit-slider-thumb]:cursor-pointer
+                             [&::-webkit-slider-thumb]:shadow-lg
+                             [&::-moz-range-thumb]:w-5
+                             [&::-moz-range-thumb]:h-5
+                             [&::-moz-range-thumb]:rounded-full
+                             [&::-moz-range-thumb]:bg-blue-500
+                             [&::-moz-range-thumb]:border-0"
+                  aria-label="Seek video"
                 />
                 <button
                   onClick={() => {
