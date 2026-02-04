@@ -93,13 +93,15 @@ export function TimelineCanvas() {
     if (!cutPoint) return;
 
     // Calculate new X position
+    // Scale delta by inverse of zoom - when zoomed 2x, a 10px drag should move half as far in timeline space
+    const scaledDeltaX = event.delta.x / zoomLevel;
     const baseX = getXFromTime(cutPoint.time);
-    const newX = baseX + event.delta.x;
+    const newX = baseX + scaledDeltaX;
 
     // Convert to time
     const newTime = getTimeFromX(newX);
     setDragTime(newTime);
-  }, [cutPoints, draggingId, getTimeFromX, getXFromTime]);
+  }, [cutPoints, draggingId, getTimeFromX, getXFromTime, zoomLevel]);
 
   // Handle drag end - commit the change
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -114,8 +116,10 @@ export function TimelineCanvas() {
     }
 
     // Calculate final position
+    // Scale delta by inverse of zoom for consistent behavior with drag preview
+    const scaledDeltaX = event.delta.x / zoomLevel;
     const baseX = getXFromTime(cutPoint.time);
-    const newX = baseX + event.delta.x;
+    const newX = baseX + scaledDeltaX;
     const newTime = getTimeFromX(newX);
 
     // Update in store
@@ -124,7 +128,7 @@ export function TimelineCanvas() {
     // Clear drag state
     setDraggingId(null);
     setDragTime(null);
-  }, [cutPoints, draggingId, getTimeFromX, getXFromTime, updateCutPoint]);
+  }, [cutPoints, draggingId, getTimeFromX, getXFromTime, updateCutPoint, zoomLevel]);
 
   // Handle canvas click - seek or select segment
   const handleCanvasClick = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
