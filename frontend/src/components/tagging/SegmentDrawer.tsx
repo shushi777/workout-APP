@@ -30,6 +30,7 @@ export function SegmentDrawer() {
   const drawerVideoRef = useRef<HTMLVideoElement>(null);
   const [drawerTime, setDrawerTime] = useState(0);
   const [isDrawerPlaying, setIsDrawerPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   // Local form state
   const [name, setName] = useState('');
@@ -54,10 +55,12 @@ export function SegmentDrawer() {
 
     const handlePlay = () => setIsDrawerPlaying(true);
     const handlePause = () => setIsDrawerPlaying(false);
+    const handleVolumeChange = () => setIsMuted(video.muted);
 
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
+    video.addEventListener('volumechange', handleVolumeChange);
 
     // Initialize time to segment start
     setDrawerTime(segment.start);
@@ -66,6 +69,7 @@ export function SegmentDrawer() {
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
+      video.removeEventListener('volumechange', handleVolumeChange);
     };
   }, [segment]);
 
@@ -120,7 +124,15 @@ export function SegmentDrawer() {
     segment && videoUrl ? `${videoUrl}#t=${segment.start},${segment.end}` : '';
 
   return (
-    <Drawer open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+    <Drawer open={isOpen} onOpenChange={(open) => {
+      if (!open) {
+        const video = drawerVideoRef.current;
+        if (video) {
+          video.pause();
+        }
+        handleClose();
+      }
+    }}>
       <DrawerContent className="bg-gray-900 border-gray-800 max-h-[90vh]">
         <DrawerHeader className="border-b border-gray-800 pb-3">
           <div className="flex items-center justify-between">
@@ -151,15 +163,21 @@ export function SegmentDrawer() {
                 ref={drawerVideoRef}
                 key={previewUrl} // Force reload when segment changes
                 src={previewUrl}
-                className="w-full aspect-video object-contain cursor-pointer"
+                className="w-full aspect-video object-contain"
                 playsInline
-                autoPlay
-                muted
-                onClick={() => {
+                onLoadedMetadata={() => {
                   const video = drawerVideoRef.current;
-                  if (video) {
-                    isDrawerPlaying ? video.pause() : video.play();
-                  }
+                  if (!video || !segment) return;
+
+                  video.currentTime = segment.start;
+                  video.muted = false;
+
+                  video.play().catch(() => {
+                    // Browser blocked autoplay with sound - fall back to muted
+                    video.muted = true;
+                    setIsMuted(true);
+                    video.play().catch(console.error);
+                  });
                 }}
               />
               {/* Custom Controls - Segment-relative seekbar */}
@@ -201,6 +219,24 @@ export function SegmentDrawer() {
                              [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full
                              [&::-webkit-slider-thumb]:bg-blue-500"
                 />
+                <button
+                  onClick={() => {
+                    const video = drawerVideoRef.current;
+                    if (video) {
+                      video.muted = !video.muted;
+                      setIsMuted(video.muted);
+                    }
+                  }}
+                  className="w-11 h-11 flex items-center justify-center rounded-lg
+                             bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors"
+                  aria-label={isMuted ? 'Unmute' : 'Mute'}
+                >
+                  {isMuted ? (
+                    <VolumeX className="w-6 h-6 text-white" />
+                  ) : (
+                    <Volume2 className="w-6 h-6 text-white" />
+                  )}
+                </button>
               </div>
             </div>
           )}
