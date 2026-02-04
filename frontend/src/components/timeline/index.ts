@@ -2,3 +2,4 @@ export { TimelineCanvas } from './TimelineCanvas';
 export { DraggableCutPoint } from './DraggableCutPoint';
 export { VideoPlayer } from './VideoPlayer';
 export { SaveFlow } from './SaveFlow';
+export { SceneDetectorSettings } from './SceneDetectorSettings';
