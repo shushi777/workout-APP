@@ -40,7 +40,6 @@ export function EditorPage() {
     deleteCutPoint,
     clearAllCutPoints,
     selectSegment,
-    selectCutPoint,
     loadExistingTags,
   } = useTimelineStore();
 

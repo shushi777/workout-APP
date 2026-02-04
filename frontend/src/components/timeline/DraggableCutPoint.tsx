@@ -13,7 +13,7 @@ interface DraggableCutPointProps {
  * Draggable cut point overlay for the timeline
  * Positioned over canvas cut points for touch-friendly dragging
  */
-export function DraggableCutPoint({ id, x, type, isSelected, onSelect }: DraggableCutPointProps) {
+export function DraggableCutPoint({ id, x, isSelected, onSelect }: DraggableCutPointProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id,
   });

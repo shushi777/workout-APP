@@ -255,6 +255,7 @@ export function TimelineCanvas() {
                 x={x}
                 type={cp.type}
                 isSelected={selectedCutPointId === cp.id || draggingId === cp.id}
+                onSelect={() => selectCutPoint(cp.id)}
               />
             );
           })}
