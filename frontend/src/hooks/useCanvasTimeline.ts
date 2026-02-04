@@ -75,8 +75,9 @@ export function useCanvasTimeline(
     const { width, height, dpr } = context;
 
     // Set canvas size with DPR for sharp rendering
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
+    // Use Math.floor to prevent fractional pixels on non-integer DPR (e.g., 1.5, 2.5)
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
 
     // Set display size
     canvas.style.width = `${width}px`;
