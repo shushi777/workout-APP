@@ -121,8 +121,16 @@ export function SegmentDrawer() {
 
   const togglePlayPause = () => {
     const video = drawerVideoRef.current;
-    if (video) {
-      isDrawerPlaying ? video.pause() : video.play();
+    if (!video || !segment) return;
+
+    if (isDrawerPlaying) {
+      video.pause();
+    } else {
+      // Reset to start if at or past segment end
+      if (video.currentTime >= segment.end - 0.1) {
+        video.currentTime = segment.start;
+      }
+      video.play();
     }
   };
 
@@ -179,11 +187,15 @@ export function SegmentDrawer() {
                   video.currentTime = segment.start;
                   video.muted = false;
 
-                  video.play().catch(() => {
+                  video.play().then(() => {
+                    setIsDrawerPlaying(true);  // Sync state immediately after autoplay
+                  }).catch(() => {
                     // Browser blocked autoplay with sound - fall back to muted
                     video.muted = true;
                     setIsMuted(true);
-                    video.play().catch(console.error);
+                    video.play().then(() => {
+                      setIsDrawerPlaying(true);  // Sync state for muted fallback too
+                    }).catch(console.error);
                   });
                 }}
               />
