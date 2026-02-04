@@ -21,6 +21,7 @@ export function EditorPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteSingleConfirm, setShowDeleteSingleConfirm] = useState(false);
 
   // Get URL parameters
   const videoUrl = searchParams.get('video');
@@ -33,10 +34,13 @@ export function EditorPage() {
     segments,
     cutPoints,
     selectedSegmentIndex,
+    selectedCutPointId,
     loadVideo,
     addCutPoint,
+    deleteCutPoint,
     clearAllCutPoints,
     selectSegment,
+    selectCutPoint,
     loadExistingTags,
   } = useTimelineStore();
 
@@ -227,8 +231,50 @@ export function EditorPage() {
         </div>
       )}
 
+      {/* Individual Delete FAB - appears when cut point selected */}
+      {selectedCutPointId && (
+        <div className="fixed bottom-20 right-4 z-50">
+          <Button
+            onClick={() => setShowDeleteSingleConfirm(true)}
+            variant="destructive"
+            className="w-14 h-14 rounded-full shadow-lg"
+            aria-label="מחק נקודת חיתוך"
+          >
+            <Trash2 className="w-6 h-6" />
+          </Button>
+        </div>
+      )}
+
       {/* Segment Tagging Drawer */}
       <SegmentDrawer />
+
+      {/* Delete Single Cut Point Confirmation Dialog */}
+      <Dialog open={showDeleteSingleConfirm} onOpenChange={setShowDeleteSingleConfirm}>
+        <DialogContent className="bg-gray-800 border-gray-700" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-gray-100">מחיקת נקודת חיתוך</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              האם למחוק את נקודת החיתוך הנבחרת?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:flex-row-reverse">
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (selectedCutPointId) {
+                  deleteCutPoint(selectedCutPointId);
+                }
+                setShowDeleteSingleConfirm(false);
+              }}
+            >
+              מחק
+            </Button>
+            <Button variant="secondary" onClick={() => setShowDeleteSingleConfirm(false)}>
+              ביטול
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete All Confirmation Dialog */}
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
