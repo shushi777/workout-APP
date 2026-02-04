@@ -272,3 +272,36 @@ export async function deleteExercise(exerciseId: number): Promise<DeleteExercise
 
   return response.json();
 }
+
+// Reprocess Video API Types and Function
+
+export interface ReprocessResponse {
+  success: boolean;
+  scene_count: number;
+  suggested_cuts: number[];
+  message?: string;
+}
+
+/**
+ * Reprocess video with new scene detection settings
+ */
+export async function reprocessVideo(
+  videoPath: string,
+  threshold: number,
+  minSceneLength: number
+): Promise<ReprocessResponse> {
+  const params = new URLSearchParams({
+    path: videoPath,
+    threshold: threshold.toString(),
+    min_scene_length: minSceneLength.toString(),
+  });
+
+  const response = await fetch(`/reprocess?${params.toString()}`);
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(error.error || 'Failed to reprocess video');
+  }
+
+  return response.json();
+}
