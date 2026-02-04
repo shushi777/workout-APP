@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTimelineStore } from '@/stores/timelineStore';
-import { TimelineCanvas, VideoPlayer, SaveFlow } from '@/components/timeline';
+import { useSceneDetectorStore } from '@/stores/sceneDetectorStore';
+import { TimelineCanvas, VideoPlayer, SaveFlow, SceneDetectorSettings } from '@/components/timeline';
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
@@ -11,10 +12,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { getTags } from '@/lib/api';
+import { getTags, reprocessVideo } from '@/lib/api';
 import { formatTime } from '@/hooks/useCanvasTimeline';
 import { cn } from '@/lib/utils';
-import { Scissors, Check, X, Trash2 } from 'lucide-react';
+import { Settings, Scissors, Check, X, Trash2, Loader2 } from 'lucide-react';
 import { SegmentDrawer } from '@/components/tagging/SegmentDrawer';
 
 export function EditorPage() {
@@ -22,6 +23,10 @@ export function EditorPage() {
   const navigate = useNavigate();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showDeleteSingleConfirm, setShowDeleteSingleConfirm] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showReprocessConfirm, setShowReprocessConfirm] = useState(false);
+  const [isReprocessing, setIsReprocessing] = useState(false);
+  const [pendingCuts, setPendingCuts] = useState<number[] | null>(null);
 
   // Get URL parameters
   const videoUrl = searchParams.get('video');
@@ -42,6 +47,9 @@ export function EditorPage() {
     selectSegment,
     loadExistingTags,
   } = useTimelineStore();
+
+  // Scene detector store
+  const { threshold, minSceneLen } = useSceneDetectorStore();
 
   // Load video metadata and initialize store
   useEffect(() => {
@@ -93,6 +101,50 @@ export function EditorPage() {
     }
   };
 
+  // Handle reprocess video with new detection settings
+  const handleReprocess = async () => {
+    if (!videoUrl) return;
+
+    setIsReprocessing(true);
+    setShowSettings(false); // Close settings drawer
+
+    try {
+      // Extract video path from URL: /download/folder/file.mp4 -> output/folder/file.mp4
+      const videoPath = videoUrl.replace('/download/', 'output/');
+
+      const result = await reprocessVideo(videoPath, threshold, minSceneLen);
+
+      // Store pending cuts for confirmation
+      setPendingCuts(result.suggested_cuts);
+      setShowReprocessConfirm(true);
+
+    } catch (error) {
+      console.error('[EditorPage] Reprocessing failed:', error);
+      // Show error dialog or toast
+      alert('שגיאה בזיהוי סצנות: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setIsReprocessing(false);
+    }
+  };
+
+  // Handle confirm reprocess - replace all cut points
+  const handleConfirmReprocess = () => {
+    if (!pendingCuts || !videoUrl) return;
+
+    // Replace ALL cut points with new detection results
+    // loadVideo will clear existing cuts and create new ones from suggestedCuts
+    loadVideo(videoUrl, videoDuration, pendingCuts);
+
+    setPendingCuts(null);
+    setShowReprocessConfirm(false);
+  };
+
+  // Handle cancel reprocess - keep existing cuts
+  const handleCancelReprocess = () => {
+    setPendingCuts(null);
+    setShowReprocessConfirm(false);
+  };
+
   // If no video URL, show error
   if (!videoUrl) {
     return (
@@ -117,10 +169,28 @@ export function EditorPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4" dir="rtl">
+      {/* Loading overlay during reprocessing */}
+      {isReprocessing && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
+          <div className="bg-gray-800 rounded-lg p-6 flex flex-col items-center gap-4">
+            <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+            <p className="text-gray-200">מזהה סצנות...</p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-100">עורך טיימליין</h1>
         <div className="flex gap-2">
+          <Button
+            onClick={() => setShowSettings(true)}
+            variant="secondary"
+            size="sm"
+            aria-label="הגדרות זיהוי סצנות"
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
           <Button onClick={handleAddCutPoint} variant="secondary" size="sm">
             <Scissors className="w-4 h-4 ml-1" />
             הוסף חיתוך
@@ -244,6 +314,14 @@ export function EditorPage() {
         </div>
       )}
 
+      {/* Scene Detector Settings Drawer */}
+      <SceneDetectorSettings
+        open={showSettings}
+        onOpenChange={setShowSettings}
+        onReprocess={handleReprocess}
+        isProcessing={isReprocessing}
+      />
+
       {/* Segment Tagging Drawer */}
       <SegmentDrawer />
 
@@ -299,6 +377,36 @@ export function EditorPage() {
             <Button
               variant="secondary"
               onClick={() => setShowDeleteConfirm(false)}
+            >
+              ביטול
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reprocess Confirmation Dialog */}
+      <Dialog open={showReprocessConfirm} onOpenChange={setShowReprocessConfirm}>
+        <DialogContent className="bg-gray-800 border-gray-700" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-gray-100">אישור תוצאות זיהוי</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              נמצאו {pendingCuts?.length || 0} נקודות חיתוך חדשות.
+              <br />
+              <span className="text-yellow-400 font-medium">
+                פעולה זו תחליף את כל נקודות החיתוך הקיימות.
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:flex-row-reverse">
+            <Button
+              variant="primary"
+              onClick={handleConfirmReprocess}
+            >
+              אישור
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleCancelReprocess}
             >
               ביטול
             </Button>
