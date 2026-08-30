@@ -168,7 +168,7 @@ export function EditorPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4" dir="rtl">
+    <div className="flex flex-col gap-4 p-4 overflow-x-hidden" dir="rtl">
       {/* Loading overlay during reprocessing */}
       {isReprocessing && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
@@ -179,10 +179,10 @@ export function EditorPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Header - wraps instead of overflowing the viewport on narrow screens */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-bold text-gray-100">עורך טיימליין</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center justify-start gap-2">
           <Button
             onClick={() => setShowSettings(true)}
             variant="secondary"

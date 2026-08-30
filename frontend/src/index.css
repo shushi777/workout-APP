@@ -132,4 +132,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* In RTL a horizontal overflow scrolls the page off to the left, which
+     pushes fixed overlays (drawers, dialogs) partly off screen. Clamp it. */
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
 }

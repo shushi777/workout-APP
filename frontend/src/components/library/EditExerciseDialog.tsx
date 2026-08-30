@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,6 +6,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { AutocompleteChips } from '@/components/tagging/AutocompleteChips';
+import type { AutocompleteChipsHandle } from '@/components/tagging/AutocompleteChips';
 import { Button } from '@/components/ui/Button';
 import type { Exercise } from '@/lib/api';
 
@@ -36,6 +37,10 @@ export function EditExerciseDialog({
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Used to commit text still sitting in the tag inputs when saving
+  const muscleGroupsRef = useRef<AutocompleteChipsHandle>(null);
+  const equipmentRef = useRef<AutocompleteChipsHandle>(null);
+
   // Initialize form with exercise data when dialog opens
   useEffect(() => {
     if (exercise) {
@@ -49,18 +54,22 @@ export function EditExerciseDialog({
   const handleSave = async () => {
     if (!exercise) return;
 
+    // Pick up any tag the user typed but never confirmed with Enter / +
+    const finalMuscleGroups = muscleGroupsRef.current?.flush() ?? muscleGroups;
+    const finalEquipment = equipmentRef.current?.flush() ?? equipment;
+
     // Validation
     if (!exerciseName.trim()) {
       setError('Exercise name is required');
       return;
     }
 
-    if (muscleGroups.length === 0) {
+    if (finalMuscleGroups.length === 0) {
       setError('At least one muscle group is required');
       return;
     }
 
-    if (equipment.length === 0) {
+    if (finalEquipment.length === 0) {
       setError('At least one equipment is required');
       return;
     }
@@ -71,8 +80,8 @@ export function EditExerciseDialog({
     try {
       await onSave(exercise.id, {
         exercise_name: exerciseName.trim(),
-        muscle_groups: muscleGroups,
-        equipment: equipment,
+        muscle_groups: finalMuscleGroups,
+        equipment: finalEquipment,
       });
       onClose();
     } catch (err) {
@@ -121,20 +130,26 @@ export function EditExerciseDialog({
 
           {/* Muscle groups */}
           <AutocompleteChips
+            ref={muscleGroupsRef}
             label="Muscle Groups"
             placeholder="Type to search or add new..."
             options={allMuscleGroups}
             value={muscleGroups}
             onChange={setMuscleGroups}
+            suggestionsLabel="Existing muscle groups - tap to add"
+            emptySuggestionsLabel="No saved muscle groups yet - type to create one"
           />
 
           {/* Equipment */}
           <AutocompleteChips
+            ref={equipmentRef}
             label="Equipment"
             placeholder="Type to search or add new..."
             options={allEquipment}
             value={equipment}
             onChange={setEquipment}
+            suggestionsLabel="Existing equipment - tap to add"
+            emptySuggestionsLabel="No saved equipment yet - type to create one"
           />
 
           {/* Actions */}

@@ -29,18 +29,22 @@ export function DetectionSlider({
   const displayValue = step < 1 ? value.toFixed(1) : value.toString();
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 min-w-0">
       {/* Label and current value */}
-      <div className="flex items-center justify-between">
-        <label htmlFor={id} className="text-sm font-medium text-gray-200">
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <label htmlFor={id} className="min-w-0 text-sm font-medium text-gray-200">
           {label}
         </label>
-        <span className="text-sm font-mono text-blue-400">{displayValue}</span>
+        <span className="shrink-0 text-sm font-mono text-blue-400" dir="ltr">
+          {displayValue}
+        </span>
       </div>
 
-      {/* Slider input */}
+      {/* Slider input - kept LTR so the gradient fill lines up with the thumb,
+          matching the min/max markers below */}
       <input
         type="range"
+        dir="ltr"
         id={id}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
@@ -48,7 +52,7 @@ export function DetectionSlider({
         max={max}
         step={step}
         aria-describedby={helpId}
-        className="detection-slider w-full h-2 rounded-full bg-gray-700 appearance-none cursor-pointer"
+        className="detection-slider block w-full h-2 rounded-full bg-gray-700 appearance-none cursor-pointer"
         style={{
           '--value-percent': `${percentage}%`,
           background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${percentage}%, #374151 ${percentage}%, #374151 100%)`,

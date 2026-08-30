@@ -23,3 +23,6 @@ Thumbs.db
 frontend/dev-dist/
 static/react/
 nul
+
+# Node dependencies
+node_modules/

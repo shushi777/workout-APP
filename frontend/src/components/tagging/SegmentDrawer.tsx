@@ -8,6 +8,7 @@ import {
   DrawerClose,
 } from '@/components/ui/drawer';
 import { AutocompleteChips } from './AutocompleteChips';
+import type { AutocompleteChipsHandle } from './AutocompleteChips';
 import { Button } from '@/components/ui/Button';
 import { useTimelineStore } from '@/stores/timelineStore';
 import { formatTime } from '@/hooks/useCanvasTimeline';
@@ -37,6 +38,10 @@ export function SegmentDrawer() {
   const [muscleGroups, setMuscleGroups] = useState<string[]>([]);
   const [equipment, setEquipment] = useState<string[]>([]);
   const [removeAudio, setRemoveAudio] = useState(false);
+
+  // Used to commit text still sitting in the tag inputs when saving
+  const muscleGroupsRef = useRef<AutocompleteChipsHandle>(null);
+  const equipmentRef = useRef<AutocompleteChipsHandle>(null);
 
   // Drawer video time tracking and segment boundary enforcement
   useEffect(() => {
@@ -100,10 +105,14 @@ export function SegmentDrawer() {
       return;
     }
 
+    // Pick up any tag the user typed but never confirmed with Enter / +
+    const finalMuscleGroups = muscleGroupsRef.current?.flush() ?? muscleGroups;
+    const finalEquipment = equipmentRef.current?.flush() ?? equipment;
+
     updateSegmentDetails(selectedSegmentIndex, {
       name: name.trim(),
-      muscleGroups,
-      equipment,
+      muscleGroups: finalMuscleGroups,
+      equipment: finalEquipment,
       removeAudio,
     });
 
@@ -288,20 +297,26 @@ export function SegmentDrawer() {
 
           {/* Muscle Groups */}
           <AutocompleteChips
+            ref={muscleGroupsRef}
             label="Muscle Groups"
             placeholder="Type or select muscle group..."
             options={existingTags.muscleGroups}
             value={muscleGroups}
             onChange={setMuscleGroups}
+            suggestionsLabel="Existing muscle groups - tap to add"
+            emptySuggestionsLabel="No saved muscle groups yet - type to create one"
           />
 
           {/* Equipment */}
           <AutocompleteChips
+            ref={equipmentRef}
             label="Equipment"
             placeholder="Type or select equipment..."
             options={existingTags.equipment}
             value={equipment}
             onChange={setEquipment}
+            suggestionsLabel="Existing equipment - tap to add"
+            emptySuggestionsLabel="No saved equipment yet - type to create one"
           />
 
           {/* Remove Audio Toggle */}
