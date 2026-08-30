@@ -1,6 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { useState, useRef, useImperativeHandle } from 'react';
+import type { Ref } from 'react';
+import { X, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+export interface AutocompleteChipsHandle {
+  /**
+   * Commit whatever text is still sitting in the input and return the
+   * resulting list. Parents call this before saving so a value the user
+   * typed but never confirmed is not silently dropped.
+   */
+  flush: () => string[];
+}
 
 interface AutocompleteChipsProps {
   label: string;
@@ -8,6 +18,11 @@ interface AutocompleteChipsProps {
   options: string[];
   value: string[];
   onChange: (value: string[]) => void;
+  /** Heading shown above the row of pickable existing values */
+  suggestionsLabel?: string;
+  /** Shown instead of the suggestion chips when there are no options yet */
+  emptySuggestionsLabel?: string;
+  ref?: Ref<AutocompleteChipsHandle>;
 }
 
 export function AutocompleteChips({
@@ -16,89 +31,76 @@ export function AutocompleteChips({
   options,
   value,
   onChange,
+  suggestionsLabel = 'Suggestions',
+  emptySuggestionsLabel,
+  ref,
 }: AutocompleteChipsProps) {
   const [inputValue, setInputValue] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Filter options based on input and exclude already selected
-  const filteredOptions = options.filter(
+  const isSelected = (option: string) =>
+    value.some((v) => v.toLowerCase() === option.toLowerCase());
+
+  // Existing values the user can tap, narrowed by whatever is typed so far
+  const suggestions = options.filter(
     (opt) =>
-      opt.toLowerCase().includes(inputValue.toLowerCase()) &&
-      !value.includes(opt)
+      !isSelected(opt) &&
+      opt.toLowerCase().includes(inputValue.trim().toLowerCase())
   );
 
-  const addChip = (chip: string) => {
-    const trimmed = chip.trim();
-    if (trimmed && !value.includes(trimmed)) {
-      onChange([...value, trimmed]);
-    }
+  /**
+   * Add `raw` to the list and clear the input. Returns the resulting list so
+   * callers can use it immediately instead of waiting for a re-render.
+   */
+  const commit = (raw: string): string[] => {
+    const trimmed = raw.trim();
     setInputValue('');
-    setIsOpen(false);
-    setHighlightedIndex(-1);
+
+    if (!trimmed || isSelected(trimmed)) return value;
+
+    // Reuse the existing spelling when the typed text matches a known option
+    const canonical =
+      options.find((opt) => opt.toLowerCase() === trimmed.toLowerCase()) ??
+      trimmed;
+
+    const next = [...value, canonical];
+    onChange(next);
+    return next;
   };
+
+  useImperativeHandle(ref, () => ({ flush: () => commit(inputValue) }));
 
   const removeChip = (chip: string) => {
     onChange(value.filter((v) => v !== chip));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
-        addChip(filteredOptions[highlightedIndex]);
-      } else if (inputValue.trim()) {
-        addChip(inputValue);
-      }
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setHighlightedIndex((prev) =>
-        prev < filteredOptions.length - 1 ? prev + 1 : prev
-      );
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
-    } else if (e.key === 'Escape') {
-      setIsOpen(false);
-      setHighlightedIndex(-1);
+      commit(inputValue);
     } else if (e.key === 'Backspace' && !inputValue && value.length > 0) {
       removeChip(value[value.length - 1]);
     }
   };
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   return (
-    <div className="space-y-2" ref={containerRef}>
+    <div className="space-y-2 min-w-0">
       <label className="block text-sm font-medium text-gray-300">{label}</label>
 
-      {/* Chips */}
+      {/* Selected chips */}
       {value.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-2">
+        <div className="flex flex-wrap gap-2">
           {value.map((chip) => (
             <span
               key={chip}
-              className="inline-flex items-center gap-1 bg-blue-600 text-white px-2 py-1 rounded-full text-sm"
+              className="inline-flex items-center gap-1 bg-blue-600 text-white px-2 py-1 rounded-full text-sm max-w-full"
             >
-              {chip}
+              <span className="truncate">{chip}</span>
               <button
                 type="button"
                 onClick={() => removeChip(chip)}
-                className="hover:bg-blue-700 rounded-full p-0.5"
+                className="hover:bg-blue-700 rounded-full p-0.5 shrink-0"
+                aria-label={`Remove ${chip}`}
               >
                 <X className="w-3 h-3" />
               </button>
@@ -107,43 +109,75 @@ export function AutocompleteChips({
         </div>
       )}
 
-      {/* Input with dropdown */}
-      <div className="relative">
+      {/* Free text input + explicit add button (mobile keyboards do not always
+          deliver a usable Enter key press) */}
+      <div className="flex gap-2 min-w-0" data-vaul-no-drag>
         <input
           ref={inputRef}
           type="text"
           value={inputValue}
-          onChange={(e) => {
-            setInputValue(e.target.value);
-            setIsOpen(true);
-            setHighlightedIndex(-1);
-          }}
-          onFocus={() => setIsOpen(true)}
+          onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
+          // Commit on blur so text typed but never confirmed is not lost
+          onBlur={() => commit(inputValue)}
           placeholder={placeholder}
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white
+          autoComplete="off"
+          autoCorrect="off"
+          enterKeyHint="done"
+          className="flex-1 min-w-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white
                      placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-
-        {/* Dropdown */}
-        {isOpen && filteredOptions.length > 0 && (
-          <ul className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-            {filteredOptions.map((option, index) => (
-              <li
-                key={option}
-                onClick={() => addChip(option)}
-                className={cn(
-                  'px-3 py-2 cursor-pointer text-white',
-                  index === highlightedIndex && 'bg-gray-700',
-                  index !== highlightedIndex && 'hover:bg-gray-700'
-                )}
-              >
-                {option}
-              </li>
-            ))}
-          </ul>
-        )}
+        <button
+          type="button"
+          // Keep focus in the input so onBlur does not commit the same text twice
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            commit(inputValue);
+            inputRef.current?.focus();
+          }}
+          disabled={!inputValue.trim()}
+          className="shrink-0 w-11 h-11 flex items-center justify-center rounded-lg bg-blue-600
+                     text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-40
+                     disabled:pointer-events-none"
+          aria-label={`Add ${label}`}
+        >
+          <Plus className="w-5 h-5" />
+        </button>
       </div>
+
+      {/* Existing values, tappable */}
+      {options.length > 0 ? (
+        <div className="space-y-1">
+          <p className="text-xs text-gray-500">{suggestionsLabel}</p>
+          {suggestions.length > 0 ? (
+            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+              {suggestions.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  // Prevent the blur-commit from also adding the typed text
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => commit(option)}
+                  className={cn(
+                    'inline-flex items-center gap-1 max-w-full rounded-full border border-gray-600',
+                    'bg-gray-800 px-3 py-1.5 text-sm text-gray-200',
+                    'hover:bg-gray-700 hover:border-gray-500 active:bg-gray-600'
+                  )}
+                >
+                  <Plus className="w-3 h-3 shrink-0 text-gray-400" />
+                  <span className="truncate">{option}</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-gray-600">—</p>
+          )}
+        </div>
+      ) : (
+        emptySuggestionsLabel && (
+          <p className="text-xs text-gray-600">{emptySuggestionsLabel}</p>
+        )
+      )}
     </div>
   );
 }
